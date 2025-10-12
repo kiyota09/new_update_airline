@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
+import Sidebar from './NewSideBar.vue'
 
 // === Demo Data (Replace later with backend) ===
 const transactions = ref([
@@ -81,45 +82,42 @@ const confirmRefund = () => {
 <template>
   <Head title="Payment & Billing Management" />
   
-    <div
-      class="min-h-screen bg-gradient-to-b from-blue-50 to-white text-gray-800 dark:from-gray-900 dark:to-gray-800 dark:text-gray-100"
-    >
-      <!-- Header -->
-      <header
-        class="bg-white/80 backdrop-blur-sm border-b border-gray-200 dark:bg-gray-900/80 dark:border-gray-700 sticky top-0 z-50"
-      >
-        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 class="text-2xl font-bold text-blue-600 dark:text-blue-400">
-            Payment & Billing Management
-          </h1>
+  <div class="flex min-h-screen bg-gray-50">
+    <Sidebar />
+    
+    <div class="flex-1 ml-64">
+      <div class="p-6">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">Payment & Billing Management</h1>
+            <p class="text-gray-600">Manage payments, refunds, and billing transactions</p>
+          </div>
           <button
             class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition"
           >
             + New Payment
           </button>
         </div>
-      </header>
 
-      <!-- Main Content -->
-      <main class="container mx-auto px-4 py-8">
         <!-- Dashboard Summary -->
         <div class="grid md:grid-cols-3 gap-6 mb-8">
-          <div class="bg-green-100 dark:bg-green-900/30 p-6 rounded-2xl shadow text-center">
+          <div class="bg-green-100 p-6 rounded-2xl shadow text-center">
             <h2 class="text-3xl font-bold text-green-600">{{ totalIncome.toLocaleString() }} ₱</h2>
-            <p class="font-medium text-gray-700 dark:text-gray-300">Total Income</p>
+            <p class="font-medium text-gray-700">Total Income</p>
           </div>
-          <div class="bg-yellow-100 dark:bg-yellow-900/30 p-6 rounded-2xl shadow text-center">
+          <div class="bg-yellow-100 p-6 rounded-2xl shadow text-center">
             <h2 class="text-3xl font-bold text-yellow-600">{{ totalPending.toLocaleString() }} ₱</h2>
-            <p class="font-medium text-gray-700 dark:text-gray-300">Pending Payments</p>
+            <p class="font-medium text-gray-700">Pending Payments</p>
           </div>
-          <div class="bg-red-100 dark:bg-red-900/30 p-6 rounded-2xl shadow text-center">
+          <div class="bg-red-100 p-6 rounded-2xl shadow text-center">
             <h2 class="text-3xl font-bold text-red-600">{{ totalRefunds.toLocaleString() }} ₱</h2>
-            <p class="font-medium text-gray-700 dark:text-gray-300">Total Refunds</p>
+            <p class="font-medium text-gray-700">Total Refunds</p>
           </div>
         </div>
 
         <!-- Transactions Table -->
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
           <table class="w-full text-left border-collapse">
             <thead class="bg-blue-600 text-white">
               <tr>
@@ -137,7 +135,7 @@ const confirmRefund = () => {
               <tr
                 v-for="transaction in transactions"
                 :key="transaction.id"
-                class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                class="border-b border-gray-200 hover:bg-gray-50 transition"
               >
                 <td class="py-3 px-4">{{ transaction.id }}</td>
                 <td class="py-3 px-4 font-medium">{{ transaction.bookingId }}</td>
@@ -183,7 +181,7 @@ const confirmRefund = () => {
           class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
         >
           <div
-            class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-md"
+            class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md"
           >
             <h3 class="text-xl font-bold mb-4 text-blue-600">
               Receipt / Invoice
@@ -220,12 +218,12 @@ const confirmRefund = () => {
           class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
         >
           <div
-            class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-md"
+            class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md"
           >
             <h3 class="text-xl font-bold mb-4 text-red-600">
               Confirm Refund
             </h3>
-            <p class="mb-4 text-gray-700 dark:text-gray-300">
+            <p class="mb-4 text-gray-700">
               Are you sure you want to refund <strong>{{ selectedTransaction.amount.toLocaleString() }} ₱</strong> for booking <strong>{{ selectedTransaction.bookingId }}</strong>?
             </p>
 
@@ -245,9 +243,9 @@ const confirmRefund = () => {
             </div>
           </div>
         </div>
-      </main>
+      </div>
     </div>
-
+  </div>
 </template>
 
 <style scoped>

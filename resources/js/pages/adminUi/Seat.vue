@@ -1,6 +1,6 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import AppLayout from '@/layouts/AppLayout.vue'
+import Sidebar from './NewSideBar.vue'
 
 // === State ===
 const occupiedSeats = ref(['1A', '1B', '2C', '3E', '4F', '5G', '6H', '7I'])
@@ -54,22 +54,25 @@ const exportSeats = () => {
 
 <template>
   <Head title="Seat Management" />
-  <AppLayout>
-    <div class="min-h-screen bg-gradient-to-b from-blue-50 to-white text-gray-800 dark:from-gray-900 dark:to-gray-800 dark:text-gray-100">
-      <!-- Header -->
-      <header class="bg-white/80 backdrop-blur-sm border-b border-gray-200 dark:bg-gray-900/80 dark:border-gray-700 sticky top-0 z-50">
-        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 class="text-2xl font-bold text-blue-600 dark:text-blue-400">Seat Management</h1>
+  
+  <div class="flex min-h-screen bg-gray-50">
+    <Sidebar />
+    
+    <div class="flex-1 ml-64">
+      <div class="p-6">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">Seat Management</h1>
+            <p class="text-gray-600">Manage aircraft seat layout and assignments</p>
+          </div>
           <button
             class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition"
           >
             + Configure Layout
           </button>
         </div>
-      </header>
 
-      <!-- Main Content -->
-      <main class="container mx-auto px-4 py-8">
         <!-- Seat class legend -->
         <div class="flex flex-wrap justify-center gap-4 mb-8">
           <div v-for="cls in seatClasses" :key="cls.id" class="flex items-center gap-2">
@@ -101,7 +104,7 @@ const exportSeats = () => {
               'bg-green-50 border-green-200': zone.id === 'economy',
             }"
           >
-            <h2 class="text-xl font-bold mb-4 text-center text-gray-800 dark:text-gray-100">
+            <h2 class="text-xl font-bold mb-4 text-center text-gray-800">
               {{ zone.name }}
             </h2>
 
@@ -164,16 +167,16 @@ const exportSeats = () => {
         </div>
 
         <!-- Seat Summary -->
-        <div class="mt-8 text-center text-gray-700 dark:text-gray-300 font-medium">
+        <div class="mt-8 text-center text-gray-700 font-medium">
           <p>
             <strong>Total Seats:</strong> {{ summary.total }} &nbsp;•&nbsp;
             <strong>Occupied:</strong> {{ summary.occupied }} &nbsp;•&nbsp;
             <strong>Available:</strong> {{ summary.total - summary.occupied }}
           </p>
         </div>
-      </main>
+      </div>
     </div>
-  </AppLayout>
+  </div>
 </template>
 
 <style scoped>

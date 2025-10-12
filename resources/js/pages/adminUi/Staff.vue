@@ -1,6 +1,6 @@
 <script setup>
-import AppLayout from '@/layouts/AppLayout.vue';
 import { ref } from 'vue';
+import Sidebar from './NewSideBar.vue';
 
 // === Staff Data (demo) ===
 const staffList = ref([
@@ -92,22 +92,18 @@ const assignStaff = () => {
 
 <template>
     <Head title="Staff Management" />
-    <AppLayout>
-        <div
-            class="min-h-screen bg-gradient-to-b from-blue-50 to-white text-gray-800 dark:from-gray-900 dark:to-gray-800 dark:text-gray-100"
-        >
-            <!-- Header -->
-            <header
-                class="sticky top-0 z-50 border-b border-gray-200 bg-white/80 backdrop-blur-sm dark:border-gray-700 dark:bg-gray-900/80"
-            >
-                <div
-                    class="container mx-auto flex items-center justify-between px-4 py-4"
-                >
-                    <h1
-                        class="text-2xl font-bold text-blue-600 dark:text-blue-400"
-                    >
-                        Staff Management
-                    </h1>
+    
+    <div class="flex min-h-screen bg-gray-50">
+        <Sidebar />
+        
+        <div class="flex-1 ml-64">
+            <div class="p-6">
+                <!-- Header -->
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">Staff Management</h1>
+                        <p class="text-gray-600">Manage airline staff and assignments</p>
+                    </div>
                     <button
                         @click="openAddModal"
                         class="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700"
@@ -115,27 +111,21 @@ const assignStaff = () => {
                         + Add Staff
                     </button>
                 </div>
-            </header>
 
-            <!-- Main Content -->
-            <main class="container mx-auto px-4 py-8">
+                <!-- Staff Directory -->
                 <div class="mb-6 flex items-center justify-between">
-                    <h2
-                        class="text-xl font-bold text-gray-700 dark:text-gray-200"
-                    >
+                    <h2 class="text-xl font-bold text-gray-700">
                         Staff Directory
                     </h2>
                     <input
                         type="text"
                         placeholder="Search by name or role..."
-                        class="rounded-lg border border-gray-300 bg-gray-50 px-4 py-2 text-sm dark:bg-gray-700"
+                        class="rounded-lg border border-gray-300 bg-gray-50 px-4 py-2 text-sm"
                     />
                 </div>
 
                 <!-- Staff Table -->
-                <div
-                    class="overflow-hidden rounded-2xl bg-white shadow-xl dark:bg-gray-800"
-                >
+                <div class="overflow-hidden rounded-2xl bg-white shadow-xl">
                     <table class="w-full border-collapse text-left">
                         <thead class="bg-blue-600 text-white">
                             <tr>
@@ -152,7 +142,7 @@ const assignStaff = () => {
                             <tr
                                 v-for="staff in staffList"
                                 :key="staff.id"
-                                class="border-b border-gray-200 transition hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-700"
+                                class="border-b border-gray-200 transition hover:bg-gray-50"
                             >
                                 <td class="px-4 py-3">{{ staff.id }}</td>
                                 <td class="px-4 py-3 font-medium">
@@ -201,9 +191,7 @@ const assignStaff = () => {
                 </div>
 
                 <!-- Summary -->
-                <div
-                    class="mt-8 text-center font-medium text-gray-700 dark:text-gray-300"
-                >
+                <div class="mt-8 text-center font-medium text-gray-700">
                     Total Staff: {{ staffList.length }}
                 </div>
 
@@ -212,9 +200,7 @@ const assignStaff = () => {
                     v-if="showModal"
                     class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
                 >
-                    <div
-                        class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-gray-800"
-                    >
+                    <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
                         <h3 class="mb-4 text-xl font-bold text-blue-600">
                             {{
                                 selectedStaff.id
@@ -232,7 +218,7 @@ const assignStaff = () => {
                                     type="text"
                                     v-model="selectedStaff.name"
                                     placeholder="Enter full name"
-                                    class="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2 dark:bg-gray-700"
+                                    class="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2"
                                 />
                             </div>
 
@@ -242,7 +228,7 @@ const assignStaff = () => {
                                 >
                                 <select
                                     v-model="selectedStaff.role"
-                                    class="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2 dark:bg-gray-700"
+                                    class="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2"
                                 >
                                     <option value="">Select Role</option>
                                     <option>Pilot</option>
@@ -262,7 +248,7 @@ const assignStaff = () => {
                                     type="text"
                                     v-model="selectedStaff.department"
                                     placeholder="e.g., Flight Operations"
-                                    class="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2 dark:bg-gray-700"
+                                    class="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2"
                                 />
                             </div>
 
@@ -272,7 +258,7 @@ const assignStaff = () => {
                                 >
                                 <select
                                     v-model="selectedStaff.status"
-                                    class="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2 dark:bg-gray-700"
+                                    class="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2"
                                 >
                                     <option>Active</option>
                                     <option>Available</option>
@@ -304,9 +290,7 @@ const assignStaff = () => {
                     v-if="showAssignModal"
                     class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
                 >
-                    <div
-                        class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-gray-800"
-                    >
+                    <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
                         <h3 class="mb-4 text-xl font-bold text-blue-600">
                             Assign Flight to {{ selectedStaff.name }}
                         </h3>
@@ -318,7 +302,7 @@ const assignStaff = () => {
                             v-model="selectedStaff.assignedFlight"
                             type="text"
                             placeholder="Enter flight number (e.g., FL-102)"
-                            class="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2 dark:bg-gray-700"
+                            class="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2"
                         />
 
                         <div class="mt-6 flex justify-end gap-2">
@@ -334,12 +318,12 @@ const assignStaff = () => {
                             >
                                 Assign
                             </button>
-                        </button>
+                        </div>
                     </div>
                 </div>
-            </main>
+            </div>
         </div>
-    </AppLayout>
+    </div>
 </template>
 
 <style scoped>

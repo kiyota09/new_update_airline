@@ -1,54 +1,18 @@
 <script setup>
+import Sidebar from './NewSideBar.vue'
 
 </script>
 
 <template>
   <Head title="Booking Management" />
   
-    <div
-      class="min-h-screen bg-gradient-to-b from-blue-50 to-white text-gray-800 dark:from-gray-900 dark:to-gray-800 dark:text-gray-100"
-    >
-      <!-- Header -->
-      <header
-        class="bg-white/80 backdrop-blur-sm border-b border-gray-200 dark:bg-gray-900/80 dark:border-gray-700 sticky top-0 z-50"
-      >
-        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div class="flex items-center space-x-4">
-            <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-              <svg
-                class="w-6 h-6 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-                ></path>
-              </svg>
-            </div>
-            <span class="text-xl font-bold text-blue-600 dark:text-blue-400"
-              >SkyWings Admin</span
-            >
-          </div>
-
-          <div class="relative">
-            <button
-              class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center cursor-pointer hover:ring-2 hover:ring-blue-500 transition"
-            >
-              <span class="text-white font-bold uppercase">AD</span>
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <!-- Main Content -->
-      <main class="container mx-auto px-4 py-8">
+  <div class="flex min-h-screen bg-gray-50">
+    <Sidebar />
+    
+    <div class="flex-1 ml-64">
+      <div class="p-6">
         <div class="flex justify-between items-center mb-8">
-          <h1 class="text-3xl font-bold text-blue-600 dark:text-blue-400">
+          <h1 class="text-3xl font-bold text-blue-600">
             Booking Management
           </h1>
           <button
@@ -60,7 +24,7 @@
 
         <!-- Bookings Table -->
         <div
-          class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden"
+          class="bg-white rounded-2xl shadow-xl overflow-hidden"
         >
           <table class="w-full text-left border-collapse">
             <thead class="bg-blue-600 text-white">
@@ -77,7 +41,7 @@
             <tbody>
               <!-- Example Row -->
               <tr
-                class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                class="border-b border-gray-200 hover:bg-gray-50 transition"
               >
                 <td class="py-3 px-4">BK-1024</td>
                 <td class="py-3 px-4">John Dela Cruz</td>
@@ -116,7 +80,7 @@
 
               <!-- Another Sample Row -->
               <tr
-                class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                class="border-b border-gray-200 hover:bg-gray-50 transition"
               >
                 <td class="py-3 px-4">BK-1025</td>
                 <td class="py-3 px-4">Maria Santos</td>
@@ -148,19 +112,19 @@
 
         <!-- Passenger Manifest Section -->
         <div
-          class="mt-12 bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6"
+          class="mt-12 bg-white rounded-2xl shadow-xl p-6"
         >
-          <h2 class="text-2xl font-bold mb-4 text-blue-600 dark:text-blue-400">
+          <h2 class="text-2xl font-bold mb-4 text-blue-600">
             Passenger Manifest
           </h2>
-          <p class="text-gray-600 dark:text-gray-300 mb-4">
+          <p class="text-gray-600 mb-4">
             View passengers for a specific flight.
           </p>
           <div class="flex space-x-4 mb-6">
             <input
               type="text"
               placeholder="Enter Flight Number (e.g., FL-230)"
-              class="flex-1 rounded-lg border border-gray-300 px-4 py-2 bg-gray-50 dark:bg-gray-700"
+              class="flex-1 rounded-lg border border-gray-300 px-4 py-2 bg-gray-50"
             />
             <button
               class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition"
@@ -171,7 +135,7 @@
 
           <!-- Example Table -->
           <table class="w-full text-left border-collapse">
-            <thead class="bg-blue-100 dark:bg-gray-700">
+            <thead class="bg-blue-100">
               <tr>
                 <th class="py-2 px-4">#</th>
                 <th class="py-2 px-4">Passenger Name</th>
@@ -180,13 +144,13 @@
               </tr>
             </thead>
             <tbody>
-              <tr class="border-b border-gray-200 dark:border-gray-700">
+              <tr class="border-b border-gray-200">
                 <td class="py-2 px-4">1</td>
                 <td class="py-2 px-4">John Dela Cruz</td>
                 <td class="py-2 px-4">12A</td>
                 <td class="py-2 px-4 text-green-600 font-medium">Checked-In</td>
               </tr>
-              <tr class="border-b border-gray-200 dark:border-gray-700">
+              <tr class="border-b border-gray-200">
                 <td class="py-2 px-4">2</td>
                 <td class="py-2 px-4">Maria Santos</td>
                 <td class="py-2 px-4">14B</td>
@@ -195,9 +159,9 @@
             </tbody>
           </table>
         </div>
-      </main>
+      </div>
     </div>
-
+  </div>
 </template>
 
 <style scoped>

@@ -76,7 +76,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::post('/aircraft', [AdminController::class, 'index'])->name('aircraft');
 
-    Route::get('/air', [AdminController::class, 'show'])->name('air');
+    Route::get('/aircraftdata', [AdminController::class, 'show'])->name('aircraftdata');
 });
 
 // -----------------------------
