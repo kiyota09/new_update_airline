@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import topbar from '@/components/Topbar.vue'
 import { useForm } from '@inertiajs/vue3'
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 
 interface Airport {
   id: number
@@ -31,6 +31,21 @@ interface Booking {
   flightNumber: string
   date: string
   status: 'Paid' | 'Pending' | 'Cancelled'
+}
+
+interface Flight {
+  id: number
+  airline: string
+  flightNumber: string
+  departure: string
+  destination: string
+  departureTime: string
+  arrivalTime: string
+  duration: string
+  price: number
+  date: string
+  seatsAvailable: number
+  aircraft: string
 }
 
 const form = useForm({
@@ -130,9 +145,95 @@ const bookings: Booking[] = [
   },
 ]
 
-// ✈️ Booking Modal Controls
+// ✈️ Available Flights Data
+const availableFlights: Flight[] = [
+  {
+    id: 1,
+    airline: 'SkyWings Airlines',
+    flightNumber: 'SW501',
+    departure: 'Manila (MNL)',
+    destination: 'Tokyo (NRT)',
+    departureTime: '08:00 AM',
+    arrivalTime: '02:30 PM',
+    duration: '6h 30m',
+    price: 450,
+    date: '2024-03-15',
+    seatsAvailable: 24,
+    aircraft: 'Airbus A330'
+  },
+  {
+    id: 2,
+    airline: 'Pacific Airways',
+    flightNumber: 'PA789',
+    departure: 'Manila (MNL)',
+    destination: 'Tokyo (NRT)',
+    departureTime: '02:15 PM',
+    arrivalTime: '08:45 PM',
+    duration: '6h 30m',
+    price: 520,
+    date: '2024-03-15',
+    seatsAvailable: 12,
+    aircraft: 'Boeing 787'
+  },
+  {
+    id: 3,
+    airline: 'SkyWings Airlines',
+    flightNumber: 'SW502',
+    departure: 'Manila (MNL)',
+    destination: 'Tokyo (NRT)',
+    departureTime: '10:30 PM',
+    arrivalTime: '05:00 AM',
+    duration: '6h 30m',
+    price: 380,
+    date: '2024-03-15',
+    seatsAvailable: 45,
+    aircraft: 'Airbus A330'
+  },
+  {
+    id: 4,
+    airline: 'Asia Connect',
+    flightNumber: 'AC321',
+    departure: 'Manila (MNL)',
+    destination: 'Tokyo (NRT)',
+    departureTime: '06:45 AM',
+    arrivalTime: '01:15 PM',
+    duration: '6h 30m',
+    price: 490,
+    date: '2024-03-16',
+    seatsAvailable: 8,
+    aircraft: 'Boeing 737'
+  },
+  {
+    id: 5,
+    airline: 'SkyWings Airlines',
+    flightNumber: 'SW503',
+    departure: 'Manila (MNL)',
+    destination: 'Tokyo (NRT)',
+    departureTime: '04:20 PM',
+    arrivalTime: '10:50 PM',
+    duration: '6h 30m',
+    price: 420,
+    date: '2024-03-16',
+    seatsAvailable: 32,
+    aircraft: 'Airbus A320'
+  }
+]
+
+// Alternative dates for flights
+const alternativeDates = [
+  '2024-03-16',
+  '2024-03-17',
+  '2024-03-18',
+  '2024-03-19',
+  '2024-03-20'
+]
+
+// Modal Controls
 const showModal = ref(false)
+const showFlightResultsModal = ref(false)
+const showPaymentModal = ref(false)
 const selectedDestination = ref<Destination | null>(null)
+const selectedFlight = ref<Flight | null>(null)
 
 // 🧾 Booking Form (used in the booking modal)
 const bookingForm = ref({
@@ -154,9 +255,32 @@ const closeModal = () => {
   selectedDestination.value = null
 }
 
-// ✈️ Payment Confirmation Modal Controls
-const showPaymentModal = ref(false)
+// ✈️ Flight Search Results Functions
+const openFlightResultsModal = () => {
+  
+    showFlightResultsModal.value = true
+  
+}
 
+const closeFlightResultsModal = () => {
+  showFlightResultsModal.value = false
+  selectedFlight.value = null
+}
+
+const selectFlight = (flight: Flight) => {
+  selectedFlight.value = flight
+}
+
+const proceedToPayment = () => {
+  if (selectedFlight.value) {
+    showFlightResultsModal.value = false
+    showPaymentModal.value = true
+  } else {
+    alert('Please select a flight first.')
+  }
+}
+
+// ✈️ Payment Confirmation Modal Controls
 const confirmPayment = () => {
   showPaymentModal.value = true
 }
@@ -166,9 +290,14 @@ const cancelPayment = () => {
 }
 
 const finalizePayment = () => {
-  alert(`Payment successful for ${selectedDestination.value?.name}`)
+  if (selectedFlight.value) {
+    alert(`Payment successful for flight ${selectedFlight.value.flightNumber} to ${selectedFlight.value.destination}`)
+  } else if (selectedDestination.value) {
+    alert(`Payment successful for ${selectedDestination.value?.name}`)
+  }
   showPaymentModal.value = false
   closeModal()
+  closeFlightResultsModal()
 }
 
 // Dummy airports
@@ -179,7 +308,7 @@ const airports = [
 ]
 
 const searchFlights = () => {
-  form.post('/booking')
+  openFlightResultsModal()
 }
 
 // Filter search
@@ -197,6 +326,24 @@ watch(destinationSearch, (val) => {
       a.airport.toLowerCase().includes(val.toLowerCase()),
   )
 })
+
+// Filter flights based on search criteria
+const filteredFlights = computed(() => {
+  return availableFlights.filter(flight => 
+    flight.departure.includes(form.departure.split(' - ')[0]) &&
+    flight.destination.includes(form.destination.split(' - ')[0]) &&
+    flight.date === form.departureDate
+  )
+})
+
+// Get flights for alternative dates
+const getFlightsForDate = (date: string) => {
+  return availableFlights.filter(flight => 
+    flight.departure.includes(form.departure.split(' - ')[0]) &&
+    flight.destination.includes(form.destination.split(' - ')[0]) &&
+    flight.date === date
+  )
+}
 </script>
 
 <template>
@@ -388,6 +535,127 @@ watch(destinationSearch, (val) => {
     </div>
   </section>
 
+  <!-- Flight Search Results Modal -->
+  <div
+    v-if="showFlightResultsModal"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+  >
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-11/12 md:w-4/5 lg:w-3/4 xl:w-2/3 p-6 relative max-h-[90vh] overflow-hidden flex flex-col">
+      <button
+        @click="closeFlightResultsModal"
+        class="absolute top-3 right-3 text-gray-500 hover:text-gray-800 dark:hover:text-white z-10"
+      >
+        ✕
+      </button>
+
+      <div class="space-y-6 flex-1 overflow-y-auto pr-2">
+        <!-- Search Summary -->
+        <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+          <h2 class="text-2xl font-bold mb-2">Available Flights</h2>
+          <p class="text-gray-600 dark:text-gray-300">
+            {{ form.departure }} → {{ form.destination }} • {{ form.departureDate }} • 
+            {{ form.passengers }} Passenger{{ parseInt(form.passengers) > 1 ? 's' : '' }} • 
+            {{ flightClasses.find(fc => fc.id === form.flightClasses)?.name }}
+          </p>
+        </div>
+
+        <!-- Selected Date Flights -->
+        <div>
+          <h3 class="text-xl font-semibold mb-4">Flights on {{ form.departureDate }}</h3>
+          <div class="space-y-4">
+            <div
+              v-for="flight in filteredFlights"
+              :key="flight.id"
+              class="border rounded-lg p-4 hover:border-blue-500 transition-colors cursor-pointer"
+              :class="selectedFlight?.id === flight.id ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-200 dark:border-gray-700'"
+              @click="selectFlight(flight)"
+            >
+              <div class="flex flex-col md:flex-row md:items-center justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center space-x-4">
+                    <div class="text-center">
+                      <div class="text-lg font-bold">{{ flight.departureTime }}</div>
+                      <div class="text-sm text-gray-500">{{ flight.departure }}</div>
+                    </div>
+                    <div class="flex-1 text-center">
+                      <div class="text-sm text-gray-500">{{ flight.duration }}</div>
+                      <div class="w-full h-px bg-gray-300 my-1"></div>
+                      <div class="text-xs text-gray-500">Direct</div>
+                    </div>
+                    <div class="text-center">
+                      <div class="text-lg font-bold">{{ flight.arrivalTime }}</div>
+                      <div class="text-sm text-gray-500">{{ flight.destination }}</div>
+                    </div>
+                  </div>
+                  <div class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                    {{ flight.airline }} • {{ flight.aircraft }} • {{ flight.flightNumber }}
+                  </div>
+                </div>
+                <div class="mt-4 md:mt-0 md:ml-4 text-center">
+                  <div class="text-2xl font-bold text-green-600">${{ flight.price }}</div>
+                  <div class="text-sm text-gray-500">{{ flight.seatsAvailable }} seats left</div>
+                  <button
+                    @click.stop="selectFlight(flight)"
+                    class="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  >
+                    {{ selectedFlight?.id === flight.id ? 'Selected' : 'Select Flight' }}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div v-if="filteredFlights.length === 0" class="text-center py-8 text-gray-500">
+              No flights found for the selected date. Please check alternative dates below.
+            </div>
+          </div>
+        </div>
+
+        <!-- Alternative Dates -->
+        <div>
+          <h3 class="text-xl font-semibold mb-4">Also Available On These Dates</h3>
+          <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+            <div
+              v-for="date in alternativeDates"
+              :key="date"
+              class="border rounded-lg p-3 text-center cursor-pointer hover:border-blue-500 transition-colors"
+            >
+              <div class="font-semibold">{{ new Date(date).toLocaleDateString('en-US', { weekday: 'short' }) }}</div>
+              <div class="text-lg font-bold">{{ new Date(date).getDate() }}</div>
+              <div class="text-sm text-gray-500">{{ new Date(date).toLocaleDateString('en-US', { month: 'short' }) }}</div>
+              <div class="text-xs text-green-600 mt-1">
+                {{ getFlightsForDate(date).length }} flights
+              </div>
+              <div class="text-xs text-gray-500">
+                from ${{ getFlightsForDate(date).reduce((min, flight) => flight.price < min ? flight.price : min, getFlightsForDate(date)[0]?.price || 0) }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Proceed to Payment Button -->
+        <div class="border-t pt-4 mt-6">
+          <div class="flex justify-between items-center">
+            <div>
+              <div v-if="selectedFlight" class="text-lg font-semibold">
+                Selected: {{ selectedFlight.airline }} {{ selectedFlight.flightNumber }}
+              </div>
+              <div v-if="selectedFlight" class="text-2xl font-bold text-green-600">
+                Total: ${{ selectedFlight.price * parseInt(form.passengers) }}
+              </div>
+            </div>
+            <button
+              @click="proceedToPayment"
+              :disabled="!selectedFlight"
+              class="px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+            >
+              Proceed to Payment
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Booking Modal -->
   <div
     v-if="showModal"
@@ -515,10 +783,35 @@ watch(destinationSearch, (val) => {
       </button>
 
       <h2 class="text-2xl font-bold mb-4">Payment Confirmation</h2>
-      <p class="text-gray-600 dark:text-gray-300 mb-6">
-        You are about to confirm payment for
-        <strong>{{ selectedDestination?.name }}</strong>.
-      </p>
+      <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+        <div v-if="selectedFlight" class="space-y-2">
+          <p class="font-semibold">{{ selectedFlight.airline }} - {{ selectedFlight.flightNumber }}</p>
+          <p>{{ selectedFlight.departure }} → {{ selectedFlight.destination }}</p>
+          <p>Departure: {{ selectedFlight.departureTime }}, {{ new Date(selectedFlight.date).toLocaleDateString() }}</p>
+          <p class="text-lg font-bold text-green-600">Total: ${{ selectedFlight.price * parseInt(form.passengers) }}</p>
+        </div>
+        <div v-else-if="selectedDestination" class="space-y-2">
+          <p class="font-semibold">{{ selectedDestination.name }}</p>
+          <p>Passengers: {{ bookingForm.passengers }}</p>
+          <p class="text-lg font-bold text-green-600">
+            Total: ${{
+              parseInt(selectedDestination.price.replace('$', '')) *
+              bookingForm.passengers
+            }}
+          </p>
+        </div>
+      </div>
+      
+      <div class="mb-6">
+        <label class="block text-sm font-medium mb-2">Payment Method</label>
+        <select class="w-full rounded-lg border px-4 py-2 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+          <option>Credit Card</option>
+          <option>Debit Card</option>
+          <option>PayPal</option>
+          <option>Bank Transfer</option>
+        </select>
+      </div>
+
       <div class="flex justify-end gap-4">
         <button
           @click="cancelPayment"

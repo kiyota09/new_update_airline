@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { usePage } from '@inertiajs/vue3'
 import Sidebar from './NewSideBar.vue'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 
 // Mock data
 const stats = ref({
@@ -34,8 +35,8 @@ onMounted(() => {
   // Fetch dashboard data if needed
 })
 
-
-
+const page = usePage();
+const userinfo = computed(() => page.props.UserData ?? [])
 
 
 </script>
@@ -53,11 +54,10 @@ onMounted(() => {
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-blue-100">Total Users</p>
-                <p class="text-3xl font-bold">{{ stats.totalFlights }}</p>
+                <p class="text-3xl font-bold">{{ userinfo.length}}</p>
               </div>
             </div>
           </div>
-
           <div class="rounded-2xl bg-gradient-to-br from-blue-500 to-green-600 p-6 text-white shadow-lg">
             <div class="flex items-center justify-between">
               <div>

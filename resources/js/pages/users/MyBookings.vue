@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import AppLayout from '@/layouts/AppLayout.vue'
-import { ref } from 'vue'
+
+import Topbar from '@/components/Topbar.vue';
+import { ref } from 'vue';
 
 // === Demo Data (replace with backend later) ===
 
@@ -68,21 +69,13 @@ const transactions = ref([
 </script>
 
 <template>
-  <Head title="My Bookings - SkyWings" />
-  <AppLayout>
+
     <div
       class="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 text-gray-800 dark:text-gray-100"
     >
-      <!-- HEADER -->
-      <header
-        class="bg-white/80 backdrop-blur-sm border-b border-gray-200 dark:bg-gray-900/80 dark:border-gray-700 sticky top-0 z-50"
-      >
-        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 class="text-2xl font-bold text-blue-600 dark:text-blue-400">
-            My Bookings
-          </h1>
-        </div>
-      </header>
+ 
+  <Topbar/>
+        
 
       <main class="container mx-auto px-4 py-8 space-y-12">
         <!-- ✈️ Booked Flights Section -->
@@ -194,7 +187,7 @@ const transactions = ref([
         </section>
       </main>
     </div>
-  </AppLayout>
+ 
 </template>
 
 <style scoped>

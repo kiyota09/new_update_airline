@@ -57,13 +57,15 @@ const updateform = () => {
 const back = () => {
     window.history.back();
 };
+
+
 </script>
 
 <template>
     <div class="min-h-screen bg-gradient-to-b from-blue-50 to-white text-gray-800 dark:from-gray-900 dark:to-gray-800 dark:text-gray-100">
         <Topbar />
         <!-- debug -->
-        {{ data }}
+        
 
         <main class="container mx-auto px-4 py-8">
             <div class="mx-auto max-w-4xl">

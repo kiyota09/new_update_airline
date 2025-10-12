@@ -41,4 +41,5 @@ class AdminController extends Controller
 
         return Inertia::render('adminUi/Aircraft',['aircraftss' => $aircraftss]);
     }
+
 }

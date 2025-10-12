@@ -3,10 +3,13 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\AdditionUserData;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\RouteController;
 use App\Http\Controllers\UserBookingController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserDatasController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
 
 
 Route::get('/', function () {
@@ -22,7 +25,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
     Route::get('/dashboard', function () {
+        
         return Inertia::render('users/UserHomepage');
+         
     })->name('dashboard');
 
     Route::get('/profile', [UserController::class, 'profile'])->name('profile');
@@ -34,49 +39,50 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/additional', [AdditionUserData::class, 'create'])->name('additional');
     Route::post('/additionalDatas', [AdditionUserData::class, 'store'])->name('additionalDatas');
 
-    Route::get('/u', function () {
-        return Inertia::render('adminUi/DashboardAdmin');
-    })->name('u');
-
-    Route::get('/air', function () {
-        return Inertia::render('adminUi/Aircraft');
-    })->name('air');
-
-    Route::get('/billing', function () {
-        return Inertia::render('adminUi/Billing');
-    })->name('billing');
-
-    Route::get('/bookings', function () {
-        return Inertia::render('adminUi/Bookings');
-    })->name('bookings');
-
-    Route::get('/flightmanagement', function () {
-        return Inertia::render('adminUi/Flight');
-    })->name('flightmanagement');
-
-    Route::get('/passenger', function () {
-        return Inertia::render('adminUi/Passenger');
-    })->name('passenger');
-
-    Route::get('/routes', function () {
-        return Inertia::render('adminUi/Routes');
-    })->name('routes');
-
-    Route::get('/schedule', function () {
-        return Inertia::render('adminUi/Schedule');
-    })->name('schedule');
-
-    Route::get('/seat', function () {
-        return Inertia::render('adminUi/Seat');
-    })->name('seat');
-
-    Route::get('/staff', function () {
-        return Inertia::render('adminUi/Staff');
-    })->name('staff');
+    Route::get('/u', [UserDatasController::class, 'showUser'])->name('u');
 
     Route::post('/aircraft', [AdminController::class, 'index'])->name('aircraft');
 
     Route::get('/air', [AdminController::class, 'show'])->name('air');
+
+    Route::get('/booking', function(){
+        return Inertia::render('adminUi/Bookings');
+    });
+
+    Route::get('/routess', function(){
+        return Inertia::render('adminUi/Routes');
+    });
+
+    Route::get('/schedule', function(){
+        return Inertia::render('adminUi/Schedule');
+    });
+
+    Route::get('/staff', function(){
+        return Inertia::render('adminUi/Staff');
+    });
+
+    Route::get('/passenger', function(){
+        return Inertia::render('adminUi/Passenger');
+    });
+
+    Route::get('/billing', function(){
+        return Inertia::render('adminUi/Billing');
+    });
+
+    Route::get('/seat', function(){
+        return Inertia::render('adminUi/Seat');
+    });
+
+    Route::get('/flightmanagement', function(){
+        return Inertia::render('adminUi/Flightmanagement');
+    });
+
+    Route::get('/mybooking', function(){
+        return Inertia::render('users/MyBookings');
+    });
+
+    Route::post('/route_location',[RouteController::class, 'store'])->name('route_location');
+
 });
 
 // -----------------------------
