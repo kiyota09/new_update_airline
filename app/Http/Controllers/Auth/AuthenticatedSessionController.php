@@ -34,9 +34,9 @@ class AuthenticatedSessionController extends Controller
 
         // Handle 2FA if enabled
         if (Features::enabled(Features::twoFactorAuthentication()) && $user->hasEnabledTwoFactorAuthentication()) {
-            $request->session()->put([
+            session()->put([
                 'login.id' => $user->getKey(),
-                'login.remember' => $request->boolean('remember'),
+                'login.remember' => (bool) $request['remember'],
             ]);
 
             return to_route('two-factor.login');
@@ -44,10 +44,10 @@ class AuthenticatedSessionController extends Controller
 
         // Login the user
         Auth::login($user, $request->boolean('remember'));
-        $request->session()->regenerate();
+        session()->regenerate();
 
         // Clear previous intended URL to prevent wrong redirects
-        $request->session()->forget('url.intended');
+        session()->forget('url.intended');
 
         // Role-based redirect
         if (Auth::user()->user_role === 'admins') {

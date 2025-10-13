@@ -15,4 +15,9 @@ class RouteModel extends Model
     ];
 
     protected $table = 'routes_location';
+
+    public function rout()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

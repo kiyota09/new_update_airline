@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\UserBookingModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
+
 
 class UserBookingController extends Controller
 {
@@ -34,4 +36,28 @@ class UserBookingController extends Controller
 
         return back()->with('success', 'Booking successfully created!');
     }
+
+    public function searchRoutes(Request $request){
+
+        $validated = $request->validate([
+            'departure' => 'required|string',
+            'destination' => 'required|string',
+            'departureDate' => 'required|date_format:m/d/Y',
+            'returnDate' => 'required|date_format:m/d/Y',
+            'passengers' => 'required|string',
+            'tripType' => 'required|string',
+            'flightClasses' => 'required|string',
+        ]);
+        
+        $start = Carbon::createFromFormat('m/d/Y', $request->departureDate)->startOfDay();
+        $end = Carbon::createFromFormat('m/d/Y', $request->returnDate)->endOfDay();
+
+        $routes = UserBookingModel::where('origin_route', $request->from)
+        ->where('destination_route', $request->destination)
+        ->whereBetween('date_column', [$start, $end])
+        ->get();
+
+    return response()->json($routes);
+    }
+
 }

@@ -23,22 +23,27 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Inertia::share([
-        'UserData' => function () {
+            'UserData' => function () {
                 return Cache::remember('UserData', 0, function () {
                     return \App\Models\User::all();
                 });
             },
-        
-        'userUser' => function () {
-            $user = Auth::user();
 
-            if(!$user){
-                return null;
-            }
-            $user->load('additionalData');
-            return $user;
-        }
+            'userUser' => function () {
+                $user = Auth::user();
 
-    ]);
+                if (!$user) {
+                    return null;
+                }
+                $user->load('additionalData');
+                return $user;
+            },
+
+            "RouteList" => function () {
+                
+                    return \App\Models\RouteModel::all();
+         
+            },
+        ]);
     }
 }

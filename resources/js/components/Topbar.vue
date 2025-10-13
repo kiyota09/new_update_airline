@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { router, Link, Head, usePage } from '@inertiajs/vue3'
 import type { User } from '@/types'
+import { Inertia } from '@inertiajs/inertia'
 
 // Dropdown states
 const isUserMenuOpen = ref(false)
@@ -52,7 +53,11 @@ onBeforeUnmount(() => {
 })
 
 // Logout
-const logout = () => router.post('/logout')
+const logout = () =>{
+   Inertia.router.post('/logout')
+  
+}
+
 
 // Sample notifications
 const notifications = ref([

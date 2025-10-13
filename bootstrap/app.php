@@ -21,9 +21,10 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Alias your custom middleware
         $middleware->alias([
-            'NoCache' => App\Http\Middleware\NoCache::class,
+            'no-cache' => App\Http\Middleware\NoCache::class,
         ]);
 
+        
         // Append middleware to the web group
         $middleware->web(append: [
             HandleAppearance::class,
