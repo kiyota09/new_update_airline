@@ -195,180 +195,223 @@ const prevMonth = () => {
 const nextMonth = () => {
     currentMonth.value = addDays(monthEnd.value, 1);
 };
+
+const allRoute = computed(() =>
+    page.props.RouteList
+);
+
+
 </script>
 
 <template>
-<Head title="Schedule Management" />
-<div class="flex min-h-screen bg-gray-50">
-    <Sidebar />
-    <div class="ml-64 flex-1 p-6">
-        <!-- Header -->
-        <div class="mb-6 flex items-center justify-between">
-            <h1 class="text-2xl font-bold text-blue-600">Schedule Management</h1>
-            <div class="flex gap-2">
-                <button @click="prevMonth" class="rounded-lg bg-gray-200 px-3 py-1 text-gray-700 hover:bg-gray-300">‹</button>
-                <h2 class="text-lg font-semibold">{{ format(currentMonth, 'MMMM yyyy') }}</h2>
-                <button @click="nextMonth" class="rounded-lg bg-gray-200 px-3 py-1 text-gray-700 hover:bg-gray-300">›</button>
-            </div>
-        </div>
+ 
 
-        <!-- Calendar Days -->
-        <div class="mb-2 grid grid-cols-7 text-center font-semibold text-gray-600">
-            <div v-for="d in ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']" :key="d">{{ d }}</div>
-        </div>
-
-        <!-- Calendar Grid -->
-        <div class="grid grid-cols-7 gap-2">
-            <div v-for="day in days" :key="day.toString()" class="relative flex min-h-[140px] flex-col justify-start overflow-y-auto rounded-lg border p-2 transition-colors hover:bg-gray-50"
-                :class="{'bg-white': isSameMonth(day, currentMonth), 'bg-gray-100': !isSameMonth(day, currentMonth)}"
-                @click="openAddModal(day)">
-                <div class="mb-1 flex items-start justify-between">
-                    <button class="rounded bg-blue-500 px-2 py-1 text-xs text-white opacity-0 transition-opacity hover:bg-blue-600 hover:opacity-100" @click.stop="openAddModal(day)">Add Flight</button>
-                    <div class="text-sm font-bold">{{ format(day,'d') }}</div>
-                </div>
-
-                <div v-for="flight in getFlightsForDay(day)" :key="flight.id" class="mb-1 cursor-pointer rounded-lg p-2 text-xs shadow-sm transition-shadow hover:shadow-md"
-                    :class="{
-                        'border border-green-200 bg-green-100 text-green-800': flight.status==='On Time',
-                        'border border-yellow-200 bg-yellow-100 text-yellow-800': flight.status==='Delayed',
-                        'border border-red-200 bg-red-100 text-red-800': flight.status==='Cancelled'
-                    }"
-                    @click.stop>
-                    <div class="flex items-center justify-between">
-                        <span class="font-semibold">{{ flight.flightNo }}</span>
-                        <span>{{ flight.time }}</span>
-                    </div>
-                    <div class="mt-1 flex items-center justify-between">
-                        <span>{{ flight.origin }} → {{ flight.destination }}</span>
-                    </div>
-                    <div class="mt-2 flex justify-end gap-1">
-                        <button @click.stop="openEditModal(flight)" class="rounded bg-yellow-500 px-2 py-1 text-[10px] text-white hover:bg-yellow-600">Edit</button>
-                        <button @click.stop="openNotifyModal(flight)" class="rounded bg-blue-600 px-2 py-1 text-[10px] text-white hover:bg-blue-700">Notify</button>
-                        <button @click.stop="openDeleteModal(flight)" class="rounded bg-red-600 px-2 py-1 text-[10px] text-white hover:bg-red-700">Delete</button>
-                    </div>
+    <Head title="Schedule Management" />
+    <div class="flex min-h-screen bg-gray-50">
+        <Sidebar />
+        <div class="ml-64 flex-1 p-6">
+            <!-- Header -->
+            <div class="mb-6 flex items-center justify-between">
+                <h1 class="text-2xl font-bold text-blue-600">Schedule Management</h1>
+                <div class="flex gap-2">
+                    <button @click="prevMonth"
+                        class="rounded-lg bg-gray-200 px-3 py-1 text-gray-700 hover:bg-gray-300">‹</button>
+                    <h2 class="text-lg font-semibold">{{ format(currentMonth, 'MMMM yyyy') }}</h2>
+                    <button @click="nextMonth"
+                        class="rounded-lg bg-gray-200 px-3 py-1 text-gray-700 hover:bg-gray-300">›</button>
                 </div>
             </div>
-        </div>
 
-        <!-- Add Flight Modal -->
-        <div v-if="showAddModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" @click.self="closeModals">
-            <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
-                <h3 class="mb-4 text-xl font-bold text-green-600">Add New Flight</h3>
-                <div class="space-y-4">
-                    <div>
-                        <label class="mb-1 block text-sm font-medium">Flight No.</label>
-                        <input v-model="newFlight.flightNo" type="text" placeholder="Leave empty to auto-generate"
-                            class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"/>
+            <!-- Calendar Days -->
+            <div class="mb-2 grid grid-cols-7 text-center font-semibold text-gray-600">
+                <div v-for="d in ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']" :key="d">{{ d }}</div>
+            </div>
+
+            <!-- Calendar Grid -->
+            <div class="grid grid-cols-7 gap-2">
+                <div v-for="day in days" :key="day.toString()"
+                    class="relative flex min-h-[140px] flex-col justify-start overflow-y-auto rounded-lg border p-2 transition-colors hover:bg-gray-50"
+                    :class="{ 'bg-white': isSameMonth(day, currentMonth), 'bg-gray-100': !isSameMonth(day, currentMonth) }"
+                    @click="openAddModal(day)">
+                    <div class="mb-1 flex items-start justify-between">
+                        <button
+                            class="rounded bg-blue-500 px-2 py-1 text-xs text-white opacity-0 transition-opacity hover:bg-blue-600 hover:opacity-100"
+                            @click.stop="openAddModal(day)">Add Flight</button>
+                        <div class="text-sm font-bold">{{ format(day, 'd') }}</div>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="mb-1 block text-sm font-medium">Origin *</label>
-                            <input v-model="newFlight.origin" type="text" placeholder="e.g., MNL"
-                                class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"/>
+
+                    <div v-for="flight in getFlightsForDay(day)" :key="flight.id"
+                        class="mb-1 cursor-pointer rounded-lg p-2 text-xs shadow-sm transition-shadow hover:shadow-md"
+                        :class="{
+                            'border border-green-200 bg-green-100 text-green-800': flight.status === 'On Time',
+                            'border border-yellow-200 bg-yellow-100 text-yellow-800': flight.status === 'Delayed',
+                            'border border-red-200 bg-red-100 text-red-800': flight.status === 'Cancelled'
+                        }" @click.stop>
+                        <div class="flex items-center justify-between">
+                            <span class="font-semibold">{{ flight.flightNo }}</span>
+                            <span>{{ flight.time }}</span>
                         </div>
-                        <div>
-                            <label class="mb-1 block text-sm font-medium">Destination *</label>
-                            <input v-model="newFlight.destination" type="text" placeholder="e.g., CEB"
-                                class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"/>
+                        <div class="mt-1 flex items-center justify-between">
+                            <span>{{ flight.origin }} → {{ flight.destination }}</span>
+                        </div>
+                        <div class="mt-2 flex justify-end gap-1">
+                            <button @click.stop="openEditModal(flight)"
+                                class="rounded bg-yellow-500 px-2 py-1 text-[10px] text-white hover:bg-yellow-600">Edit</button>
+                            <button @click.stop="openNotifyModal(flight)"
+                                class="rounded bg-blue-600 px-2 py-1 text-[10px] text-white hover:bg-blue-700">Notify</button>
+                            <button @click.stop="openDeleteModal(flight)"
+                                class="rounded bg-red-600 px-2 py-1 text-[10px] text-white hover:bg-red-700">Delete</button>
                         </div>
                     </div>
-                    <div>
-                        <label class="mb-1 block text-sm font-medium">Date</label>
-                        <input v-model="newFlight.date" type="date" readonly class="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2"/>
-                    </div>
-                    <div>
-                        <label class="mb-1 block text-sm font-medium">Time</label>
-                        <input v-model="newFlight.time" type="time" class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"/>
-                    </div>
-                    <div>
-                        <label class="mb-1 block text-sm font-medium">Status</label>
-                        <select v-model="newFlight.status" class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                            <option>On Time</option>
-                            <option>Delayed</option>
-                            <option>Cancelled</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="mt-6 flex justify-end gap-2">
-                    <button @click="closeModals" class="rounded-lg bg-gray-500 px-4 py-2 text-white hover:bg-gray-600">Cancel</button>
-                    <button @click="addNewFlight" class="rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700">Add Flight</button>
                 </div>
             </div>
-        </div>
 
-        <!-- Edit Flight Modal -->
-        <div v-if="showEditModal && selectedFlight" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" @click.self="closeModals">
-            <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
-                <h3 class="mb-4 text-xl font-bold text-yellow-600">Edit Flight</h3>
-                <div class="space-y-4">
-                    <div>
-                        <label class="mb-1 block text-sm font-medium">Flight No.</label>
-                        <input v-model="selectedFlight.flightNo" type="text" class="w-full rounded-lg border border-gray-300 px-4 py-2"/>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
+            <!-- Add Flight Modal -->
+            <div v-if="showAddModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+                @click.self="closeModals">
+                <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+                    <h3 class="mb-4 text-xl font-bold text-green-600">Add New Flight</h3>
+                    <div class="space-y-4">
                         <div>
-                            <label class="mb-1 block text-sm font-medium">Origin *</label>
-                            <input v-model="selectedFlight.origin" type="text" class="w-full rounded-lg border border-gray-300 px-4 py-2"/>
+                            <label class="mb-1 block text-sm font-medium">Flight No.</label>
+                            <input v-model="newFlight.flightNo" type="text" placeholder="Leave empty to auto-generate"
+                                class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent" />
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="mb-1 block text-sm font-medium">Origin *</label>
+                                <select id="origin">
+                                    <option v-for="route in allRoute" :key="route.id" :value="route.origin_route">
+                                        {{ route.origin_route }} -> {{ route.destination_route }}
+                                        
+                                    </option>
+                                </select>
+                            </div>
+
                         </div>
                         <div>
-                            <label class="mb-1 block text-sm font-medium">Destination *</label>
-                            <input v-model="selectedFlight.destination" type="text" class="w-full rounded-lg border border-gray-300 px-4 py-2"/>
+                            <label class="mb-1 block text-sm font-medium">Date</label>
+                            <input v-model="newFlight.date" type="date" readonly
+                                class="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2" />
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-sm font-medium">Time</label>
+                            <input v-model="newFlight.time" type="time"
+                                class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent" />
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-sm font-medium">Status</label>
+                            <select v-model="newFlight.status"
+                                class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                                <option>On Time</option>
+                                <option>Delayed</option>
+                                <option>Cancelled</option>
+                            </select>
                         </div>
                     </div>
-                    <div>
-                        <label class="mb-1 block text-sm font-medium">Date</label>
-                        <input v-model="selectedFlight.date" type="date" class="w-full rounded-lg border border-gray-300 px-4 py-2"/>
-                    </div>
-                    <div>
-                        <label class="mb-1 block text-sm font-medium">Time</label>
-                        <input v-model="selectedFlight.time" type="time" class="w-full rounded-lg border border-gray-300 px-4 py-2"/>
-                    </div>
-                    <div>
-                        <label class="mb-1 block text-sm font-medium">Status</label>
-                        <select v-model="selectedFlight.status" class="w-full rounded-lg border border-gray-300 px-4 py-2">
-                            <option>On Time</option>
-                            <option>Delayed</option>
-                            <option>Cancelled</option>
-                        </select>
+                    <div class="mt-6 flex justify-end gap-2">
+                        <button @click="closeModals"
+                            class="rounded-lg bg-gray-500 px-4 py-2 text-white hover:bg-gray-600">Cancel</button>
+                        <button @click="addNewFlight"
+                            class="rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700">Add Flight</button>
                     </div>
                 </div>
-                <div class="mt-6 flex justify-end gap-2">
-                    <button @click="closeModals" class="rounded-lg bg-gray-500 px-4 py-2 text-white hover:bg-gray-600">Cancel</button>
-                    <button @click="saveChanges" class="rounded-lg bg-yellow-600 px-4 py-2 text-white hover:bg-yellow-700">Save Changes</button>
+            </div>
+
+            <!-- Edit Flight Modal -->
+            <div v-if="showEditModal && selectedFlight"
+                class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" @click.self="closeModals">
+                <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+                    <h3 class="mb-4 text-xl font-bold text-yellow-600">Edit Flight</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="mb-1 block text-sm font-medium">Flight No.</label>
+                            <input v-model="selectedFlight.flightNo" type="text"
+                                class="w-full rounded-lg border border-gray-300 px-4 py-2" />
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="mb-1 block text-sm font-medium">Origin *</label>
+                                <input v-model="selectedFlight.origin" type="text"
+                                    class="w-full rounded-lg border border-gray-300 px-4 py-2" />
+                            </div>
+
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-sm font-medium">Date</label>
+                            <input v-model="selectedFlight.date" type="date"
+                                class="w-full rounded-lg border border-gray-300 px-4 py-2" />
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-sm font-medium">Time</label>
+                            <input v-model="selectedFlight.time" type="time"
+                                class="w-full rounded-lg border border-gray-300 px-4 py-2" />
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-sm font-medium">Status</label>
+                            <select v-model="selectedFlight.status"
+                                class="w-full rounded-lg border border-gray-300 px-4 py-2">
+                                <option>On Time</option>
+                                <option>Delayed</option>
+                                <option>Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mt-6 flex justify-end gap-2">
+                        <button @click="closeModals"
+                            class="rounded-lg bg-gray-500 px-4 py-2 text-white hover:bg-gray-600">Cancel</button>
+                        <button @click="saveChanges"
+                            class="rounded-lg bg-yellow-600 px-4 py-2 text-white hover:bg-yellow-700">Save
+                            Changes</button>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Delete Flight Modal -->
-        <div v-if="showDeleteModal && selectedFlight" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" @click.self="closeModals">
-            <div class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl text-center">
-                <h3 class="mb-4 text-xl font-bold text-red-600">Delete Flight</h3>
-                <p>Are you sure you want to delete flight <strong>{{ selectedFlight.flightNo }}</strong>?</p>
-                <div class="mt-6 flex justify-center gap-4">
-                    <button @click="closeModals" class="rounded-lg bg-gray-500 px-4 py-2 text-white hover:bg-gray-600">Cancel</button>
-                    <button @click="deleteFlight" class="rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700">Delete</button>
+            <!-- Delete Flight Modal -->
+            <div v-if="showDeleteModal && selectedFlight"
+                class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" @click.self="closeModals">
+                <div class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl text-center">
+                    <h3 class="mb-4 text-xl font-bold text-red-600">Delete Flight</h3>
+                    <p>Are you sure you want to delete flight <strong>{{ selectedFlight.flightNo }}</strong>?</p>
+                    <div class="mt-6 flex justify-center gap-4">
+                        <button @click="closeModals"
+                            class="rounded-lg bg-gray-500 px-4 py-2 text-white hover:bg-gray-600">Cancel</button>
+                        <button @click="deleteFlight"
+                            class="rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700">Delete</button>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Notify Modal -->
-        <div v-if="showNotifyModal && selectedFlight" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" @click.self="closeModals">
-            <div class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl text-center">
-                <h3 class="mb-4 text-xl font-bold text-blue-600">Notify Passengers</h3>
-                <p>Send notification to passengers on flight <strong>{{ selectedFlight.flightNo }}</strong>?</p>
-                <div class="mt-6 flex justify-center gap-4">
-                    <button @click="closeModals" class="rounded-lg bg-gray-500 px-4 py-2 text-white hover:bg-gray-600">Cancel</button>
-                    <button @click="sendNotification" class="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">Notify</button>
+            <!-- Notify Modal -->
+            <div v-if="showNotifyModal && selectedFlight"
+                class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" @click.self="closeModals">
+                <div class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl text-center">
+                    <h3 class="mb-4 text-xl font-bold text-blue-600">Notify Passengers</h3>
+                    <p>Send notification to passengers on flight <strong>{{ selectedFlight.flightNo }}</strong>?</p>
+                    <div class="mt-6 flex justify-center gap-4">
+                        <button @click="closeModals"
+                            class="rounded-lg bg-gray-500 px-4 py-2 text-white hover:bg-gray-600">Cancel</button>
+                        <button @click="sendNotification"
+                            class="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">Notify</button>
+                    </div>
                 </div>
             </div>
-        </div>
 
+        </div>
     </div>
-</div>
 </template>
 
 <style scoped>
-button { transition: all 0.2s ease; }
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-thumb { background: #93c5fd; border-radius: 10px; }
+button {
+    transition: all 0.2s ease;
+}
+
+::-webkit-scrollbar {
+    width: 4px;
+}
+ 
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.4);
+}
+
 </style>

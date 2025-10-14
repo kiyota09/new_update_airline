@@ -19,7 +19,7 @@ const data = defineProps<{
         country?: string;
         memberDate?: string;
     } | null;
-}>();
+}>(); 
 
 const form = useForm({
     firstname: data.additionalData?.firstname || '',
@@ -66,7 +66,7 @@ const back = () => {
         <Topbar />
         <!-- debug -->
         
-
+        {{ form }}
         <main class="container mx-auto px-4 py-8">
             <div class="mx-auto max-w-4xl">
                 <h1 class="mb-8 text-center text-3xl font-bold">My Profile</h1>

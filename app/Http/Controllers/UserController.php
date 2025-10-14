@@ -29,14 +29,14 @@ class UserController extends Controller
         $validated = $request->validate([
             'firstname'    => 'required|string|max:255',
             'lastname'     => 'required|string|max:255',
-            'middlename'   => 'nullable|string|max:255',
-            'contact'      => 'nullable|string|max:20',
-            'gender'       => 'nullable|string|in:male,female,prefer not to say',
-            'block'        => 'nullable|string|max:255',
-            'barangay'     => 'nullable|string|max:255',
-            'municipality' => 'nullable|string|max:255',
-            'province'     => 'nullable|string|max:255',
-            'country'      => 'nullable|string|max:255',
+            'middlename'   => 'required|string|max:255',
+            'contact'      => 'required|string|max:20',
+            'gender'       => 'required|string|in:male,female,prefer not to say',
+            'block'        => 'required|string|max:255',
+            'barangay'     => 'required|string|max:255',
+            'municipality' => 'required|string|max:255',
+            'province'     => 'required|string|max:255',
+            'country'      => 'required|string|max:255',
         ]);
 
         AdditionalDataModel::updateOrCreate(

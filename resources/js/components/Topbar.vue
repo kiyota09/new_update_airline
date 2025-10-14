@@ -54,7 +54,7 @@ onBeforeUnmount(() => {
 
 // Logout
 const logout = () =>{
-   Inertia.router.post('/logout')
+   router.post('/logout')
   
 }
 

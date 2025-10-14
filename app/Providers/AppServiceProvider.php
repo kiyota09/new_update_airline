@@ -41,9 +41,11 @@ class AppServiceProvider extends ServiceProvider
 
             "RouteList" => function () {
                 
-                    return \App\Models\RouteModel::all();
+                return \App\Models\RouteModel::all();
          
             },
+
+        
         ]);
     }
 }

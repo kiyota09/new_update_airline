@@ -92,6 +92,10 @@ Route::middleware(['auth', 'verified', 'no-cache'])->group(function () {
     Route::post('/admin/schedule', [FlightController::class, 'store']);
     Route::put('/admin/schedule/{flight}', [FlightController::class, 'update']);
     Route::delete('/admin/schedule/{flight}', [FlightController::class, 'destroy']);
+
+
+
+
 });
 
 // -----------------------------
