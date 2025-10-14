@@ -32,10 +32,6 @@ class AdminController extends Controller
          return back()->with('success', 'Adding Aircraft Successfully!');
     }
 
-
-
-
-
     public function show(){
         $aircraftss = AircraftModel::all();
 

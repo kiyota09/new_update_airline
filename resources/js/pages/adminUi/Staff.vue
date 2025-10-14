@@ -1,69 +1,28 @@
-<script setup>
-import { ref } from 'vue';
+<script setup lang="ts">
+import { computed, ref } from 'vue';
 import Sidebar from './NewSideBar.vue';
-
+import { useForm } from '@inertiajs/vue3';
+import { usePage } from '@inertiajs/vue3';
 // === Staff Data (demo) ===
-const staffList = ref([
-    {
-        id: 1,
-        name: 'Captain Billy Justine Macalawa',
-        role: 'Pilot',
-        department: 'Flight Operations',
-        assignedFlight: 'FL-11072',
-        status: 'Active',
-    },
-    {
-        id: 2,
-        name: 'Math Divida',
-        role: 'Cabin Crew',
-        department: 'Inflight Services',
-        assignedFlight: 'FL-11072',
-        status: 'On Duty',
-    },
-    {
-        id: 3,
-        name: 'Nath Martos',
-        role: 'Ground Staff',
-        department: 'Ground Handling',
-        assignedFlight: '-',
-        status: 'Available',
-    },
-]);
+
 
 // === States ===
 const showModal = ref(false);
 const showAssignModal = ref(false);
-const selectedStaff = ref({
-    id: null,
+
+
+const selectedStaff = useForm({
     name: '',
     role: '',
-    department: '',
-    assignedFlight: '',
-    status: 'Available',
+    assignedFlight: null,
+    status: '',
 });
 
 // === Actions ===
 const openAddModal = () => {
-    selectedStaff.value = {
-        id: null,
-        name: '',
-        role: '',
-        department: '',
-        assignedFlight: '',
-        status: 'Available',
-    };
     showModal.value = true;
 };
 
-const openEditModal = (staff) => {
-    selectedStaff.value = { ...staff };
-    showModal.value = true;
-};
-
-const openAssignModal = (staff) => {
-    selectedStaff.value = { ...staff };
-    showAssignModal.value = true;
-};
 
 const closeModals = () => {
     showModal.value = false;
@@ -71,23 +30,18 @@ const closeModals = () => {
 };
 
 const saveStaff = () => {
-    if (selectedStaff.value.id) {
-        // Edit existing
-        const index = staffList.value.findIndex(
-            (s) => s.id === selectedStaff.value.id,
-        );
-        if (index !== -1) staffList.value[index] = { ...selectedStaff.value };
-    } else {
-        // Add new
-        selectedStaff.value.id = staffList.value.length + 1;
-        staffList.value.push({ ...selectedStaff.value });
-    }
-    closeModals();
+    selectedStaff.post('/staff_submit');
 };
 
 const assignStaff = () => {
     closeModals();
 };
+const page = usePage();
+const staff = computed(() => {
+    return page.props.StaffList;
+});
+
+
 </script>
 
 <template>
@@ -95,7 +49,7 @@ const assignStaff = () => {
     
     <div class="flex min-h-screen bg-gray-50">
         <Sidebar />
-        
+       
         <div class="flex-1 ml-64">
             <div class="p-6">
                 <!-- Header -->
@@ -132,7 +86,6 @@ const assignStaff = () => {
                                 <th class="px-4 py-3">#</th>
                                 <th class="px-4 py-3">Name</th>
                                 <th class="px-4 py-3">Role</th>
-                                <th class="px-4 py-3">Department</th>
                                 <th class="px-4 py-3">Assigned Flight</th>
                                 <th class="px-4 py-3">Status</th>
                                 <th class="px-4 py-3 text-center">Actions</th>
@@ -140,46 +93,42 @@ const assignStaff = () => {
                         </thead>
                         <tbody>
                             <tr
-                                v-for="staff in staffList"
-                                :key="staff.id"
+                                v-for="staffList in staff"
+                                :key="staffList.id"
                                 class="border-b border-gray-200 transition hover:bg-gray-50"
                             >
-                                <td class="px-4 py-3">{{ staff.id }}</td>
+                                <td class="px-4 py-3">{{ staffList.id }}</td>
                                 <td class="px-4 py-3 font-medium">
-                                    {{ staff.name }}
+                                    {{ staffList.fullname }}
                                 </td>
-                                <td class="px-4 py-3">{{ staff.role }}</td>
+                                <td class="px-4 py-3">{{ staffList.role }}</td>
                                 <td class="px-4 py-3">
-                                    {{ staff.department }}
-                                </td>
-                                <td class="px-4 py-3">
-                                    {{ staff.assignedFlight }}
+                                    {{ staffList.assignedFlight }}
                                 </td>
                                 <td class="px-4 py-3">
                                     <span
                                         class="rounded-full px-3 py-1 text-sm font-medium"
                                         :class="{
                                             'bg-green-100 text-green-700':
-                                                staff.status === 'Active' ||
-                                                staff.status === 'On Duty',
+                                                staffList.status === 'Active' ||
+                                                staffList.status === 'On Duty',
                                             'bg-gray-100 text-gray-700':
-                                                staff.status === 'Available',
+                                                staffList.status === 'Available',
                                             'bg-red-100 text-red-700':
-                                                staff.status === 'Inactive',
+                                                staffList.status === 'Inactive',
                                         }"
                                     >
-                                        {{ staff.status }}
+                                        {{ staffList.status }}
                                     </span>
                                 </td>
                                 <td class="flex justify-center gap-2 px-4 py-3">
                                     <button
-                                        @click="openEditModal(staff)"
+                                        
                                         class="rounded bg-yellow-500 px-3 py-1 text-sm text-white hover:bg-yellow-600"
                                     >
                                         Edit
                                     </button>
                                     <button
-                                        @click="openAssignModal(staff)"
                                         class="rounded bg-blue-600 px-3 py-1 text-sm text-white hover:bg-blue-700"
                                     >
                                         Assign
@@ -192,11 +141,11 @@ const assignStaff = () => {
 
                 <!-- Summary -->
                 <div class="mt-8 text-center font-medium text-gray-700">
-                    Total Staff: {{ staffList.length }}
+                    Total Staff: {{ staff.length }}
                 </div>
 
                 <!-- Add/Edit Staff Modal -->
-                <div
+                <!-- <div
                     v-if="showModal"
                     class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
                 >
@@ -240,17 +189,7 @@ const assignStaff = () => {
                                 </select>
                             </div>
 
-                            <div>
-                                <label class="mb-1 block text-sm font-medium"
-                                    >Department</label
-                                >
-                                <input
-                                    type="text"
-                                    v-model="selectedStaff.department"
-                                    placeholder="e.g., Flight Operations"
-                                    class="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2"
-                                />
-                            </div>
+                          
 
                             <div>
                                 <label class="mb-1 block text-sm font-medium"
@@ -283,7 +222,7 @@ const assignStaff = () => {
                             </button>
                         </div>
                     </div>
-                </div>
+                </div> -->
                 
                 <!-- Assign Flight Modal -->
                 <div

@@ -8,6 +8,7 @@ use App\Http\Controllers\UserBookingController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserDatasController;
 use App\Http\Controllers\FlightController;
+use App\Http\Controllers\StaffController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -93,7 +94,7 @@ Route::middleware(['auth', 'verified', 'no-cache'])->group(function () {
     Route::put('/admin/schedule/{flight}', [FlightController::class, 'update']);
     Route::delete('/admin/schedule/{flight}', [FlightController::class, 'destroy']);
 
-
+    Route::post('/staff_submit', [StaffController::class, 'store'])->name('staff_submit');
 
 
 });

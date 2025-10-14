@@ -38,7 +38,7 @@ const openEditModal = (route: any) => {
   formData.id = route.id;
   formData.origin_route = route.origin_route;
   formData.destination_route = route.destination_route;
-  formData.base_price = route.base_price;
+  formData.base_price = route.base_price.toLocaleString();
   formData.duration = route.duration;
   formData.distance = route.distance;
   showEditModal.value = true;
@@ -161,7 +161,7 @@ const airports = [
                 <td class="py-3 px-4">RT-10{{ row.id }}</td>
                 <td class="py-3 px-4">{{ row.origin_route }}</td>
                 <td class="py-3 px-4">{{ row.destination_route }}</td>
-                <td class="py-3 px-4">{{ row.base_price }}</td>
+                <td class="py-3 px-4">{{ row.base_price.toLocaleString() }}</td>
                 <td class="py-3 px-4">{{ row.duration }}</td>
                 <td class="py-3 px-4">{{ row.distance }}km</td>
                 <td class="py-3 px-4 flex justify-center space-x-2">
@@ -249,7 +249,7 @@ const airports = [
           <label class="block text-sm font-medium mb-1">Duration</label>
           <input
             v-model="formData.duration"
-            type="text"
+            type="time"
             placeholder="e.g., 1h 25m"
             class="w-full rounded-lg border border-gray-300 px-4 py-2 bg-gray-50"
           />

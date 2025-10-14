@@ -47,11 +47,6 @@ class RouteController extends Controller
         return redirect()->back()->with('success', 'Route deleted successfully');
     }
 
-    public function schedRoute(Request $request){
-        $schedRoute = RouteModel::all();
-        return $schedRoute;
-        dd($schedRoute);
-    }
 
     
 }

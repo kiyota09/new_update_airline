@@ -31,7 +31,6 @@ class AppServiceProvider extends ServiceProvider
 
             'userUser' => function () {
                 $user = Auth::user();
-
                 if (!$user) {
                     return null;
                 }
@@ -40,12 +39,14 @@ class AppServiceProvider extends ServiceProvider
             },
 
             "RouteList" => function () {
-                
                 return \App\Models\RouteModel::all();
-         
             },
 
-        
+            "StaffList" => function() {
+                return \App\Models\StaffModel::all();
+            },
+
+            
         ]);
     }
 }
