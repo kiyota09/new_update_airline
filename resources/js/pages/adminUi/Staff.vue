@@ -1,15 +1,12 @@
 <script setup lang="ts">
+import { useForm, usePage } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import Sidebar from './NewSideBar.vue';
-import { useForm } from '@inertiajs/vue3';
-import { usePage } from '@inertiajs/vue3';
 // === Staff Data (demo) ===
-
 
 // === States ===
 const showModal = ref(false);
 const showAssignModal = ref(false);
-
 
 const selectedStaff = useForm({
     name: '',
@@ -23,7 +20,6 @@ const openAddModal = () => {
     showModal.value = true;
 };
 
-
 const closeModals = () => {
     showModal.value = false;
     showAssignModal.value = false;
@@ -31,6 +27,8 @@ const closeModals = () => {
 
 const saveStaff = () => {
     selectedStaff.post('/staff_submit');
+    selectedStaff.reset();
+    closeModals();
 };
 
 const assignStaff = () => {
@@ -40,23 +38,25 @@ const page = usePage();
 const staff = computed(() => {
     return page.props.StaffList;
 });
-
-
 </script>
 
 <template>
     <Head title="Staff Management" />
-    
+
     <div class="flex min-h-screen bg-gray-50">
         <Sidebar />
-       
-        <div class="flex-1 ml-64">
+
+        <div class="ml-64 flex-1">
             <div class="p-6">
                 <!-- Header -->
-                <div class="flex justify-between items-center mb-6">
+                <div class="mb-6 flex items-center justify-between">
                     <div>
-                        <h1 class="text-2xl font-bold text-gray-900">Staff Management</h1>
-                        <p class="text-gray-600">Manage airline staff and assignments</p>
+                        <h1 class="text-2xl font-bold text-gray-900">
+                            Staff Management
+                        </h1>
+                        <p class="text-gray-600">
+                            Manage airline staff and assignments
+                        </p>
                     </div>
                     <button
                         @click="openAddModal"
@@ -79,8 +79,10 @@ const staff = computed(() => {
                 </div>
 
                 <!-- Staff Table -->
-                <div class="overflow-hidden rounded-2xl bg-white shadow-xl">
-                    <table class="w-full border-collapse text-left">
+                <div
+                    class="overflow-hidden rounded-t-lg border border-gray-200 shadow-sm"
+                >
+                    <table class="min-w-full table-auto">
                         <thead class="bg-blue-600 text-white">
                             <tr>
                                 <th class="px-4 py-3">#</th>
@@ -91,17 +93,28 @@ const staff = computed(() => {
                                 <th class="px-4 py-3 text-center">Actions</th>
                             </tr>
                         </thead>
+                    </table>
+                </div>
+
+                <div
+                    class="max-h-120 overflow-auto rounded-b-lg border border-gray-200 shadow-sm"
+                >
+                    <table class="min-w-full table-auto">
                         <tbody>
                             <tr
                                 v-for="staffList in staff"
                                 :key="staffList.id"
                                 class="border-b border-gray-200 transition hover:bg-gray-50"
                             >
-                                <td class="px-4 py-3">{{ staffList.id }}</td>
+                                <td class="px-4 py-3">
+                                    {{ staffList.id }}
+                                </td>
                                 <td class="px-4 py-3 font-medium">
                                     {{ staffList.fullname }}
                                 </td>
-                                <td class="px-4 py-3">{{ staffList.role }}</td>
+                                <td class="px-4 py-3">
+                                    {{ staffList.role }}
+                                </td>
                                 <td class="px-4 py-3">
                                     {{ staffList.assignedFlight }}
                                 </td>
@@ -113,7 +126,8 @@ const staff = computed(() => {
                                                 staffList.status === 'Active' ||
                                                 staffList.status === 'On Duty',
                                             'bg-gray-100 text-gray-700':
-                                                staffList.status === 'Available',
+                                                staffList.status ===
+                                                'Available',
                                             'bg-red-100 text-red-700':
                                                 staffList.status === 'Inactive',
                                         }"
@@ -123,7 +137,7 @@ const staff = computed(() => {
                                 </td>
                                 <td class="flex justify-center gap-2 px-4 py-3">
                                     <button
-                                        
+                                        @click="saveStaff"
                                         class="rounded bg-yellow-500 px-3 py-1 text-sm text-white hover:bg-yellow-600"
                                     >
                                         Edit
@@ -145,11 +159,13 @@ const staff = computed(() => {
                 </div>
 
                 <!-- Add/Edit Staff Modal -->
-                <!-- <div
+                <div
                     v-if="showModal"
                     class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
                 >
-                    <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+                    <div
+                        class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"
+                    >
                         <h3 class="mb-4 text-xl font-bold text-blue-600">
                             {{
                                 selectedStaff.id
@@ -189,8 +205,6 @@ const staff = computed(() => {
                                 </select>
                             </div>
 
-                          
-
                             <div>
                                 <label class="mb-1 block text-sm font-medium"
                                     >Status</label
@@ -222,14 +236,16 @@ const staff = computed(() => {
                             </button>
                         </div>
                     </div>
-                </div> -->
-                
+                </div>
+
                 <!-- Assign Flight Modal -->
                 <div
                     v-if="showAssignModal"
                     class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
                 >
-                    <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+                    <div
+                        class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"
+                    >
                         <h3 class="mb-4 text-xl font-bold text-blue-600">
                             Assign Flight to {{ selectedStaff.name }}
                         </h3>

@@ -8,7 +8,10 @@ use App\Http\Controllers\UserBookingController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserDatasController;
 use App\Http\Controllers\FlightController;
+use App\Http\Controllers\locationDestinationController;
 use App\Http\Controllers\StaffController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\userHistoryController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -21,9 +24,7 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
     ->middleware('auth')
     ->name('logout');
 
-
 Route::middleware(['auth', 'verified', 'no-cache'])->group(function () {
-
 
     Route::get('/dashboard', function () {
 
@@ -87,16 +88,33 @@ Route::middleware(['auth', 'verified', 'no-cache'])->group(function () {
 
     Route::delete('/route_location/{id}', [RouteController::class, 'destroy'])->name('routes.delete');
 
-    
     Route::get('/admin/schedule', [FlightController::class, 'index']);
+
     Route::get('/admin/schedule/json', [FlightController::class, 'apiIndex']);
+
     Route::post('/admin/schedule', [FlightController::class, 'store']);
+
     Route::put('/admin/schedule/{flight}', [FlightController::class, 'update']);
+
     Route::delete('/admin/schedule/{flight}', [FlightController::class, 'destroy']);
 
     Route::post('/staff_submit', [StaffController::class, 'store'])->name('staff_submit');
 
+    Route::post('/search_destination', [locationDestinationController::class, 'search_avial'])->name('search_destination');
 
+    Route::post('/price_destination', [locationDestinationController::class, 'selected_price'])->name('price_destination');
+
+
+Route::get('/payment-success', [PaymentController::class, 'paymentSuccess'])->name('payment.success');
+Route::get('/payment-failed', [PaymentController::class, 'paymentFailed'])->name('payment.failed');
+
+    Route::post('/create-payment-intent', [PaymentController::class, 'try']);
+
+    Route::get('/payment', function(){
+       return Inertia::render('users/payment');
+    });
+
+    Route::post('/userHistory',[userHistoryController::class , 'submitTransac'])->name('userHistory');
 });
 
 // -----------------------------

@@ -23,7 +23,7 @@ class FlightController extends Controller
         $flights = Flight::orderBy('date')->get();
         return response()->json($flights);
     }
- 
+
     // Add new flight
     public function store(Request $request)
     {
@@ -68,4 +68,5 @@ class FlightController extends Controller
 
         return response()->json(['message' => 'Flight deleted']);
     }
+
 }
