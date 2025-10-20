@@ -10,11 +10,12 @@ use Illuminate\Support\Facades\File;
 
 class UserController extends Controller
 {
- 
+    // Show user profile
     public function profile()
     {
         $user = Auth::user();
 
+        // Fetch related additional data
         $additionalData = AdditionalDataModel::where('user_id', $user->id)->first();
 
         return Inertia::render('users/UserProfile', [
@@ -23,7 +24,7 @@ class UserController extends Controller
         ]);
     }
 
-
+    // Update user profile
     public function updateUser(Request $request)
     {
         $user = Auth::user();
@@ -64,6 +65,7 @@ class UserController extends Controller
             $additionalData->validId = 'uploads/ids/' . $filename;
         }
 
+      
         if ($request->hasFile('passport')) {
             $file = $request->file('passport');
             $filename = time() . '_passport.' . $file->getClientOriginalExtension();

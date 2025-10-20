@@ -67,6 +67,11 @@ class AppServiceProvider extends ServiceProvider
             },
 
             'total_income' => DB::table('history')->sum('price'),
+            'total_passenger' => DB::table('history')->sum('passenger'),
+
+            'flights_data' => function () {
+                return \App\Models\Flight::all();
+            }
 
         ]);
     }

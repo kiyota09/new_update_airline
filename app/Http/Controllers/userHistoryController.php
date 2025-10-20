@@ -47,5 +47,13 @@ class userHistoryController extends Controller
         ]);
     }
 
+    // public function show_passenger(Request $request)
+    // {
+    //     $user_history = DB::table('history as h')
+    //         ->where('h.user_id', Auth::id())
+    //         ->orderBy('h.created_at', 'desc')
+    //         ->get();
 
+    //     return response()->json($user_history);
+    // }
 }

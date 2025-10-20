@@ -37,6 +37,7 @@ onMounted(async () => {
                         + New Booking
                     </button>
                 </div>
+                
                 <!-- Bookings Table -->
                 <div class="overflow-hidden rounded-2xl bg-white shadow-xl">
                     <table class="w-full border-collapse text-left">

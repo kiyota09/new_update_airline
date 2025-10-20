@@ -1,164 +1,298 @@
 <script setup lang="ts">
-import { usePage } from '@inertiajs/vue3'
-import Sidebar from './NewSideBar.vue'
-import { ref, onMounted, computed } from 'vue'
-
+import { usePage } from '@inertiajs/vue3';
+import { format, isAfter, isBefore, parseISO ,parse} from 'date-fns';
+import { computed, onMounted } from 'vue';
+import Sidebar from './NewSideBar.vue';
 // Mock data
-const stats = ref({
-  totalFlights: 247,
-  totalBookings: 1843,
-  totalPassengers: 5234,
-  totalIncome: 1254300,
-  seatOccupancy: 78,
-  upcomingFlights: 12,
-  delayedFlights: 3,
-  recentBookings: 28
-})
-
-const recentBookings = ref([
-  { id: 'BK001', flight: 'SW501', passenger: 'John Doe', date: '2024-01-15', status: 'Confirmed' },
-  { id: 'BK002', flight: 'SW502', passenger: 'Jane Smith', date: '2024-01-15', status: 'Pending' },
-  { id: 'BK003', flight: 'SW503', passenger: 'Mike Johnson', date: '2024-01-14', status: 'Confirmed' },
-  { id: 'BK004', flight: 'SW504', passenger: 'Sarah Wilson', date: '2024-01-14', status: 'Cancelled' },
-  { id: 'BK005', flight: 'SW505', passenger: 'Chris Brown', date: '2024-01-13', status: 'Confirmed' },
-])
-
-const upcomingFlights = ref([
-  { id: 'SW506', route: 'Manila - Cebu', departure: '2024-01-15 08:00', status: 'On Time' },
-  { id: 'SW507', route: 'Cebu - Davao', departure: '2024-01-15 10:30', status: 'On Time' },
-  { id: 'SW508', route: 'Manila - Palawan', departure: '2024-01-15 12:15', status: 'Delayed' },
-  { id: 'SW509', route: 'Davao - Manila', departure: '2024-01-15 14:45', status: 'On Time' },
-])
-
 
 onMounted(() => {
-  // Fetch dashboard data if needed
-})
+    // Fetch dashboard data if needed
+});
 
 const page = usePage();
-const userinfo = computed(() => page.props.UserData ?? [])
+const userinfo = computed(() => page.props.UserData ?? []);
+const book = page.props.history; // <-- plain array
+const income = page.props.total_income;
+const total_passenger = page.props.total_passenger;
+const flight = page.props.flights_data;
+const payments = page.props.history;
 
+// ✅ Format total income with $ and commas
+const total = computed(() => {
+    return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+    }).format(income);
+});
 
+const today = new Date();
+
+// ✅ Upcoming schedules
+const upcomingSchedules = computed(() => {
+    return flight.filter((s) => isAfter(parseISO(s.date), today));
+});
+
+// ✅ Past schedules
+const pastSchedules = computed(() => {
+    return book.filter((s) => isBefore(parseISO(s.date), today));
+});
 </script>
 
 <template>
-  <div class="flex min-h-screen bg-gray-50">
-    <Sidebar />
-    
-    <div class="flex-1 ml-64">
-      <div class="p-6">
-        <!-- Stats Overview -->
-        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-6">
-          <!-- Example card -->
-          <div class="rounded-2xl bg-gradient-to-br from-gray-500 to-blue-600 p-6 text-white shadow-lg">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-blue-100">Total Users</p>
-                <p class="text-3xl font-bold">{{ userinfo.length}}</p>
-              </div>
-            </div>
-          </div>
-          <div class="rounded-2xl bg-gradient-to-br from-blue-500 to-green-600 p-6 text-white shadow-lg">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-blue-100">Total Flights</p>
-                <p class="text-3xl font-bold">{{ stats.totalFlights }}</p>
-              </div>
-            </div>
-          </div>
+    <div class="flex min-h-screen bg-gray-50">
+        <Sidebar />
 
-          <div class="rounded-2xl bg-gradient-to-br from-green-500 to-violet-600 p-6 text-white shadow-lg">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-green-100">Total Bookings</p>
-                <p class="text-3xl font-bold">{{ stats.totalBookings.toLocaleString() }}</p>
-              </div>
-            </div>
-          </div>
+        <div class="col-6 ml-64 flex-1">
+            <div class="p-6">
+                <!-- Stats Overview -->
+                <div
+                    class="mb-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4"
+                >
+                    <!-- Example card -->
+                    <div
+                        class="rounded-2xl bg-gradient-to-br from-gray-500 to-blue-600 p-6 text-white shadow-lg"
+                    >
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-blue-100">Total Users</p>
+                                <p class="text-3xl font-bold">
+                                    {{ userinfo.length }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        class="rounded-2xl bg-gradient-to-br from-blue-500 to-green-600 p-6 text-white shadow-lg"
+                    >
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-blue-100">Total Flights</p>
+                                <p class="text-3xl font-bold">
+                                    {{ flight.length }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
 
-          <div class="rounded-2xl bg-gradient-to-br from-purple-500 to-blue-600 p-6 text-white shadow-lg">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-purple-100">Total Passengers</p>
-                <p class="text-3xl font-bold">{{ stats.totalPassengers.toLocaleString() }}</p>
-              </div>
-            </div>
-          </div>
+                    <div
+                        class="rounded-2xl bg-gradient-to-br from-green-500 to-violet-600 p-6 text-white shadow-lg"
+                    >
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-green-100">Total Bookings</p>
+                                <p class="text-3xl font-bold">
+                                    {{ book.length }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
 
-          <div class="rounded-2xl bg-gradient-to-br from-orange-500 to-blue-600 p-6 text-white shadow-lg">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-orange-100">Total Income</p>
-                <p class="text-3xl font-bold">${{ (stats.totalIncome / 1000).toFixed(1) }}K</p>
-              </div>
+                    <div
+                        class="rounded-2xl bg-gradient-to-br from-purple-500 to-blue-600 p-6 text-white shadow-lg"
+                    >
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-purple-100">Total Passengers</p>
+                                <p class="text-3xl font-bold">
+                                    {{ total_passenger }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="rounded-2xl bg-gradient-to-br from-orange-500 to-blue-600 p-6 text-white shadow-lg"
+                    >
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-orange-100">Total Income</p>
+                                <p class="text-3xl font-bold">{{ total }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Tables Example -->
+                <div class="space-y-6 p-6">
+                    <!-- Upcoming Schedules -->
+                    <div class="rounded-2xl bg-white p-6 shadow-lg">
+                        <h3 class="mb-4 text-lg font-semibold text-gray-800">
+                            Upcoming Schedules
+                        </h3>
+                        <div class="overflow-x-auto">
+                            <table
+                                class="min-w-full table-auto divide-y divide-gray-200"
+                            >
+                                <thead class="rounded-t-2xl bg-gray-100">
+                                    <tr>
+                                        <th
+                                            class="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase"
+                                        >
+                                            Flight ID
+                                        </th>
+                                        <th
+                                            class="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase"
+                                        >
+                                            from
+                                        </th>
+                                        <th
+                                            class="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase"
+                                        >
+                                            to
+                                        </th>
+                                        <th
+                                            class="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase"
+                                        >
+                                            time
+                                        </th>
+                                        <th
+                                            class="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase"
+                                        >
+                                            date
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr
+                                        v-for="booking in upcomingSchedules"
+                                        :key="booking.id"
+                                        class="transition hover:bg-gray-50"
+                                    >
+                                        <td
+                                            class="px-4 py-2 text-sm font-medium text-gray-900"
+                                        >
+                                            {{ booking.flightNo }}
+                                        </td>
+                                        <td
+                                            class="px-4 py-2 text-sm text-gray-600"
+                                        >
+                                            {{ booking.origin }}
+                                        </td>
+                                        <td
+                                            class="px-4 py-2 text-sm text-gray-600"
+                                        >
+                                            {{ booking.destination }}
+                                        </td>
+                                        <td
+                                            class="px-4 py-2 text-sm text-gray-600"
+                                        >
+                                            {{
+                                                format(
+                                                    parse(
+                                                        `${booking.date} ${booking.time}`,
+                                                        'yyyy-MM-dd HH:mm',
+                                                        new Date(),
+                                                    ),
+                                                    'hh:mm a',
+                                                )
+                                            }}
+                                        </td>
+                                        <td class="px-4 py-2 text-center">
+                                            {{
+                                                new Date(
+                                                    booking.date,
+                                                ).toLocaleDateString([], {
+                                                    year: 'numeric',
+                                                    month: 'short',
+                                                    day: 'numeric',
+                                                })
+                                            }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Past Schedules -->
+                    <div class="rounded-2xl bg-white p-6 shadow-lg">
+                        <h3 class="mb-4 text-lg font-semibold text-gray-800">
+                            Past Schedules
+                        </h3>
+                        <div class="overflow-x-auto">
+                            <table
+                                class="min-w-full table-auto divide-y divide-gray-200"
+                            >
+                                <thead class="rounded-t-2xl bg-gray-100">
+                                    <tr>
+                                        <th
+                                            class="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase"
+                                        >
+                                            Booking ID
+                                        </th>
+                                        <th
+                                            class="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase"
+                                        >
+                                            Flight No.
+                                        </th>
+                                        <th
+                                            class="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase"
+                                        >
+                                            Passenger
+                                        </th>
+                                        <th
+                                            class="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase"
+                                        >
+                                            Date
+                                        </th>
+                                        <th
+                                            class="px-4 py-2 text-left text-sm font-medium text-gray-500 uppercase"
+                                        >
+                                            Status
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr
+                                        v-for="booking in pastSchedules"
+                                        :key="booking.id"
+                                        class="transition hover:bg-gray-50"
+                                    >
+                                        <td
+                                            class="px-4 py-2 text-sm font-medium text-gray-900"
+                                        >
+                                            {{ booking.booking_id }}
+                                        </td>
+                                        <td
+                                            class="px-4 py-2 text-sm text-gray-600"
+                                        >
+                                            {{ booking.flightNo }}
+                                        </td>
+                                        <td
+                                            class="px-4 py-2 text-sm text-gray-600"
+                                        >
+                                            {{ booking.passenger }}
+                                        </td>
+                                        <td
+                                            class="px-4 py-2 text-sm text-gray-600"
+                                        >
+                                            {{ booking.date }}
+                                        </td>
+                                        <td class="px-4 py-2 text-center">
+                                            <span
+                                                class="inline-block rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-800"
+                                            >
+                                                Done
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-
-        <!-- Tables Example -->
-        <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <!-- Recent Bookings -->
-          <div class="rounded-2xl bg-white p-6 shadow-lg">
-            <h3 class="mb-4 text-lg font-semibold text-gray-800">Recent Bookings</h3>
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead>
-                <tr>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Booking ID</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Flight</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Passenger</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-gray-200">
-                <tr v-for="booking in recentBookings" :key="booking.id" class="hover:bg-gray-50">
-                  <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ booking.id }}</td>
-                  <td class="px-4 py-3 text-sm text-gray-600">{{ booking.flight }}</td>
-                  <td class="px-4 py-3 text-sm text-gray-600">{{ booking.passenger }}</td>
-                  <td class="px-4 py-3 text-sm text-gray-600">{{ booking.date }}</td>
-                  <td class="px-4 py-3">
-                    <span :class="{
-                      'px-2 py-1 text-xs rounded-full': true,
-                      'bg-green-100 text-green-800': booking.status === 'Confirmed',
-                      'bg-yellow-100 text-yellow-800': booking.status === 'Pending',
-                      'bg-red-100 text-red-800': booking.status === 'Cancelled'
-                    }">{{ booking.status }}</span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Upcoming Flights -->
-          <div class="rounded-2xl bg-white p-6 shadow-lg">
-            <h3 class="mb-4 text-lg font-semibold text-gray-800">Upcoming Flights</h3>
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead>
-                <tr>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Flight ID</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Route</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Departure</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-gray-200">
-                <tr v-for="flight in upcomingFlights" :key="flight.id" class="hover:bg-gray-50">
-                  <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ flight.id }}</td>
-                  <td class="px-4 py-3 text-sm text-gray-600">{{ flight.route }}</td>
-                  <td class="px-4 py-3 text-sm text-gray-600">{{ flight.departure }}</td>
-                  <td class="px-4 py-3">
-                    <span :class="{
-                      'px-2 py-1 text-xs rounded-full': true,
-                      'bg-green-100 text-green-800': flight.status === 'On Time',
-                      'bg-yellow-100 text-yellow-800': flight.status === 'Delayed'
-                    }">{{ flight.status }}</span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
     </div>
-  </div>
 </template>
+<style scoped>
+/* Optional: horizontal scroll styling */
+::-webkit-scrollbar {
+    height: 6px;
+}
+::-webkit-scrollbar-thumb {
+    background-color: rgba(107, 114, 128, 0.5);
+    border-radius: 9999px;
+}
+</style>

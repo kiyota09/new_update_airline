@@ -16,9 +16,7 @@ class AdminController extends Controller
             'idnum'    => 'required|integer|max:100',
             'model'     => 'required|string|max:255',
             'registration'   => 'required|string|max:255',
-            'businessClassCapacity'      => 'required|integer|max:255',
-            'firstClassCapacity'      => 'required|integer|max:255',
-            'economyClassCapacity'      => 'required|integer|max:255',
+            
             'location'       => 'required|string',
         ]);
 
@@ -27,9 +25,6 @@ class AdminController extends Controller
         $aircraft->aircraft_id = $validated['idnum'];
         $aircraft->model = $validated['model'];
         $aircraft->registration = $validated['registration'];
-        $aircraft->business = $validated['businessClassCapacity'];
-        $aircraft->firstclass = $validated['firstClassCapacity'];
-        $aircraft->economy = $validated['economyClassCapacity'];
         $aircraft->location = $validated['location'];
         $aircraft->save();
 
@@ -53,7 +48,6 @@ class AdminController extends Controller
 
     $aircraft->delete();
 
-   
 }
 
 }

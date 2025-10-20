@@ -62,9 +62,6 @@ class locationDestinationController extends Controller
                 'f.*',
                 'a.model',
                 'a.registration',
-                'a.business',
-                'a.economy',
-                'a.firstclass',
                 'a.location',
                 'a.status as aircraft_status',
             )

@@ -9,9 +9,6 @@ const page = usePage();
 const form = useForm({
     model: '',
     registration: '',
-    economyClassCapacity: '',
-    businessClassCapacity: '',
-    firstClassCapacity: '',
     location: '',
     idnum: '',
 });
@@ -57,65 +54,23 @@ watch(departureSearch, (val) => {
 
 // Location data
 const location: Airport[] = [
-    {
+  {
         id: 1,
-        country: 'United States',
-        city: 'New York',
-        airport: 'John F. Kennedy International Airport (JFK)',
+        country: 'Philippines',
+        city: 'Manila',
+        airport: 'Ninoy Aquino International Airport (MNL)',
     },
     {
         id: 2,
-        country: 'United States',
-        city: 'Los Angeles',
-        airport: 'Los Angeles International Airport (LAX)',
+        country: 'Japan',
+        city: 'Tokyo',
+        airport: 'Narita International Airport (NRT)',
     },
     {
         id: 3,
-        country: 'United States',
-        city: 'Chicago',
-        airport: 'O’Hare International Airport (ORD)',
-    },
-    {
-        id: 4,
-        country: 'United States',
-        city: 'San Francisco',
-        airport: 'San Francisco International Airport (SFO)',
-    },
-    {
-        id: 5,
-        country: 'United Kingdom',
-        city: 'London',
-        airport: 'Heathrow Airport (LHR)',
-    },
-    {
-        id: 6,
-        country: 'United Kingdom',
-        city: 'London',
-        airport: 'Gatwick Airport (LGW)',
-    },
-    {
-        id: 7,
-        country: 'United Kingdom',
-        city: 'Manchester',
-        airport: 'Manchester Airport (MAN)',
-    },
-    {
-        id: 8,
-        country: 'United Kingdom',
-        city: 'Birmingham',
-        airport: 'Birmingham Airport (BHX)',
-    },
-    {
-        id: 9,
-        country: 'Germany',
-        city: 'Frankfurt',
-        airport: 'Frankfurt Airport (FRA)',
-    },
-    {
-        id: 10,
-        country: 'Germany',
-        city: 'Munich',
-        airport: 'Munich Airport (MUC)',
+        country: 'France',
+        city: 'Paris',
+        airport: 'Charles de Gaulle Airport (CDG)',
     },
     // ... add all other locations as needed
 ];
@@ -124,9 +79,6 @@ const location: Airport[] = [
 interface AircraftItem {
     model: string;
     registration: string;
-    economyClassCapacity: number | string;
-    businessClassCapacity: number | string;
-    firstClassCapacity: number | string;
     status?: string;
     location?: string;
     [key: string]: any;
@@ -152,9 +104,6 @@ const locationFlights = () => {
             aircraft.value.push({
                 model: form.model,
                 registration: form.registration,
-                economyClassCapacity: form.economyClassCapacity,
-                businessClassCapacity: form.businessClassCapacity,
-                firstClassCapacity: form.firstClassCapacity,
                 location: form.location,
                 status: 'Active', // default
             });
@@ -260,37 +209,6 @@ const deleteAircraft = async (id: number) => {
                         </div>
                     </div>
 
-                    <!-- Average Capacity -->
-                    <div
-                        class="rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 p-6 text-white shadow-lg"
-                    >
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-purple-100">Average Capacity</p>
-                                <p class="text-3xl font-bold"></p>
-                            </div>
-                            <div class="rounded-xl bg-purple-400/20 p-3">
-                                <svg
-                                    class="h-6 w-6"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
-                                    />
-                                </svg>
-                            </div>
-                        </div>
-                        <div
-                            class="mt-2 flex items-center text-sm text-purple-200"
-                        >
-                            <span class="ml-1">Seats per aircraft</span>
-                        </div>
-                    </div>
                 </div>
                 <!-- Aircraft Table -->
                 <div class="rounded-lg bg-white p-6 shadow-md">
@@ -303,18 +221,6 @@ const deleteAircraft = async (id: number) => {
                                 </th>
                                 <th class="px-4 py-2 font-medium text-gray-700">
                                     Registration
-                                </th>
-                                <th class="px-4 py-2 font-medium text-gray-700">
-                                    First Class
-                                </th>
-                                <th class="px-4 py-2 font-medium text-gray-700">
-                                    Business
-                                </th>
-                                <th class="px-4 py-2 font-medium text-gray-700">
-                                    Economy
-                                </th>
-                                <th class="px-4 py-2 font-medium text-gray-700">
-                                    Capacity
                                 </th>
                                 <th class="px-4 py-2 font-medium text-gray-700">
                                     Status
@@ -339,22 +245,6 @@ const deleteAircraft = async (id: number) => {
                                 </td>
                                 <td class="px-4 py-3">
                                     {{ aircraftItem.registration }}
-                                </td>
-                                <td class="px-4 py-3">
-                                    {{ aircraftItem.firstclass }}
-                                </td>
-                                <td class="px-4 py-3">
-                                    {{ aircraftItem.business }}
-                                </td>
-                                <td class="px-4 py-3">
-                                    {{ aircraftItem.economy }}
-                                </td>
-                                <td class="px-4 py-3">
-                                    {{
-                                        Number(aircraftItem.firstclass) +
-                                        Number(aircraftItem.business) +
-                                        Number(aircraftItem.economy) || 'loading...'
-                                    }}
                                 </td>
                                 <td class="px-4 py-3">
                                     {{ aircraftItem.status }}
@@ -417,7 +307,7 @@ const deleteAircraft = async (id: number) => {
                                 />
                             </div>
 
-                            <div>
+                            <!-- <div>
                                 <label
                                     class="block text-sm font-medium text-gray-700"
                                     >First Class</label
@@ -452,7 +342,7 @@ const deleteAircraft = async (id: number) => {
                                     class="mt-1 w-full rounded-lg border p-2"
                                     placeholder="e.g. 180"
                                 />
-                            </div>
+                            </div> -->
 
                             <div>
                                 <label
