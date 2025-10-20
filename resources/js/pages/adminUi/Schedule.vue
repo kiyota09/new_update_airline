@@ -21,6 +21,7 @@ interface Flight {
     date: string;
     time: string;
     status: 'On Time' | 'Delayed' | 'Cancelled';
+    aircraft_id: number;
 }
 
 // --- Reactive States ---
@@ -40,6 +41,7 @@ const newFlight = ref<Omit<Flight, 'id'>>({
     date: '',
     time: '08:00',
     status: 'On Time',
+    aircraft_id: 0,
 });
 
 // --- Calendar Computed ---
@@ -75,6 +77,7 @@ const fetchFlights = async () => {
             date: format(new Date(f.date), 'yyyy-MM-dd'),
             time: f.time,
             status: f.status,
+            aircraft_id: f.aircraft_id,
         }));
     } catch (err) {
         console.error('Error fetching flights:', err);
@@ -93,6 +96,7 @@ onMounted(() => {
             date: format(new Date(f.date), 'yyyy-MM-dd'),
             time: f.time,
             status: f.status as 'On Time' | 'Delayed' | 'Cancelled',
+            aircraft_id: f.aircraft_id   ,
         }));
     } else {
         fetchFlights();
@@ -109,14 +113,10 @@ const openAddModal = (date: Date) => {
         date: selectedDate.value,
         time: '08:00',
         status: 'On Time',
+        aircraft_id: 0,
     };
     showAddModal.value = true;
 };
-
-// const openEditModal = (flight: Flight) => {
-//     selectedFlight.value = { ...flight };
-//     showEditModal.value = true;
-// };
 
 const openDeleteModal = (flight: Flight) => {
     selectedFlight.value = { ...flight };
@@ -147,9 +147,11 @@ watch(selectedRouteId, (id) => {
     if (route) {
         newFlight.value.origin = route.origin_route;
         newFlight.value.destination = route.destination_route;
+        newFlight.value.aircraft_id = route.aircraft_id;
     } else {
         newFlight.value.origin = '';
         newFlight.value.destination = '';
+        newFlight.value.aircraft_id = 0;
     }
 });
 
@@ -271,7 +273,7 @@ const nextMonth = () => {
                     </button>
                 </div>
             </div>
-
+            <!-- {{ schedules }} -->
             <!-- Calendar Days -->
             <div
                 class="mb-2 grid grid-cols-7 text-center font-semibold text-gray-600"
@@ -453,6 +455,13 @@ const nextMonth = () => {
                                 <option>Cancelled</option>
                             </select>
                         </div>
+                        <div>
+                            <input
+                                v-model="newFlight.aircraft_id"
+                                type="number"
+                                class="w-100 rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-700 shadow-sm transition focus:border-green-500 focus:ring focus:ring-blue-200 focus:outline-none hidden" 
+                            />
+                        </div>
                     </div>
                     <div class="mt-6 flex justify-end gap-2">
                         <button
@@ -516,8 +525,8 @@ const nextMonth = () => {
                                     :key="route.id"
                                     :value="route.id"
                                 >
-                                    {{ route.origin_route }} → <br>
-                                    
+                                    {{ route.origin_route }} → <br />
+
                                     {{ route.destination_route }}
                                 </option>
                             </select>

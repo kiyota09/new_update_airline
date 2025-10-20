@@ -23,7 +23,7 @@ class FlightController extends Controller
         $flights = Flight::orderBy('date')->get();
         return response()->json($flights);
     }
-
+    
     // Add new flight
     public function store(Request $request)
     {
@@ -34,14 +34,13 @@ class FlightController extends Controller
             'date' => 'required|date',
             'time' => 'required|string',
             'status' => 'required|string',
+            'aircraft_id' => 'required|integer', 
         ]);
 
         if (empty($validated['flightNo'])) {
             $validated['flightNo'] = 'FL-' . rand(1000, 9999);
         }
-
         $flight = Flight::create($validated);
-
         return response()->json($flight, 201);
     }
 
@@ -55,9 +54,7 @@ class FlightController extends Controller
             'time' => 'required|string',
             'status' => 'required|string',
         ]);
-
         $flight->update($validated);
-
         return response()->json($flight);
     }
 

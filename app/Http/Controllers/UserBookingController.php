@@ -6,11 +6,11 @@ use App\Models\UserBookingModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
-
+use Illuminate\Support\Facades\DB;
 
 class UserBookingController extends Controller
 {
-     public function store(Request $request)
+    public function store(Request $request)
     {
         $validated = $request->validate([
             'departure' => 'required|string',
@@ -37,7 +37,8 @@ class UserBookingController extends Controller
         return back()->with('success', 'Booking successfully created!');
     }
 
-    public function searchRoutes(Request $request){
+    public function searchRoutes(Request $request)
+    {
 
         $validated = $request->validate([
             'departure' => 'required|string',
@@ -48,16 +49,50 @@ class UserBookingController extends Controller
             'tripType' => 'required|string',
             'flightClasses' => 'required|string',
         ]);
-        
+
         $start = Carbon::createFromFormat('m/d/Y', $request->departureDate)->startOfDay();
         $end = Carbon::createFromFormat('m/d/Y', $request->returnDate)->endOfDay();
 
         $routes = UserBookingModel::where('origin_route', $request->from)
-        ->where('destination_route', $request->destination)
-        ->whereBetween('date_column', [$start, $end])
-        ->get();
+            ->where('destination_route', $request->destination)
+            ->whereBetween('date_column', [$start, $end])
+            ->get();
 
-    return response()->json($routes);
+        return response()->json($routes);
     }
 
+    public function full_user_details()
+    {
+        $user_history = DB::table('history as h')
+            ->join('addtional_data as a', 'a.user_id', '=', 'h.user_id')
+            ->select(
+                'h.*',
+                'a.firstname',
+                'a.lastname',
+                'a.middlename',
+                'a.contact',
+                'a.gender',
+                'a.memberDate',
+                'a.block',
+                'a.barangay',
+                'a.municipality',
+                'a.province',
+                'a.country',
+            )
+            ->get();
+        return response()->json($user_history);
+    }
+
+    public function full_user2_details()
+    {
+        $user2_history = DB::table('users as u')
+            ->join('addtional_data as a', 'a.user_id', '=', 'u.id')
+            ->select(
+                // 'h.*',
+                'u.*',
+                'a.*',
+            )
+            ->get();
+        return response()->json($user2_history);
+    }
 }

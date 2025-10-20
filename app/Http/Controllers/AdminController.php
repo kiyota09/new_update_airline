@@ -16,26 +16,44 @@ class AdminController extends Controller
             'idnum'    => 'required|integer|max:100',
             'model'     => 'required|string|max:255',
             'registration'   => 'required|string|max:255',
-            'capacity'      => 'required|integer|max:255',
+            'businessClassCapacity'      => 'required|integer|max:255',
+            'firstClassCapacity'      => 'required|integer|max:255',
+            'economyClassCapacity'      => 'required|integer|max:255',
             'location'       => 'required|string',
-         ]);
-         
+        ]);
 
-         $aircraft = new AircraftModel();
-         $aircraft->aircraft_id =$validated['idnum'];
-         $aircraft->model =$validated['model'];
-         $aircraft->registration =$validated['registration'];
-         $aircraft->capacity =$validated['capacity'];
-         $aircraft->location =$validated['location'];
-         $aircraft->save();
 
-         return back()->with('success', 'Adding Aircraft Successfully!');
+        $aircraft = new AircraftModel();
+        $aircraft->aircraft_id = $validated['idnum'];
+        $aircraft->model = $validated['model'];
+        $aircraft->registration = $validated['registration'];
+        $aircraft->business = $validated['businessClassCapacity'];
+        $aircraft->firstclass = $validated['firstClassCapacity'];
+        $aircraft->economy = $validated['economyClassCapacity'];
+        $aircraft->location = $validated['location'];
+        $aircraft->save();
+
+        return back()->with('success', 'Adding Aircraft Successfully!');
     }
 
-    public function show(){
+    public function show()
+    {
         $aircraftss = AircraftModel::all();
 
-        return Inertia::render('adminUi/Aircraft',['aircraftss' => $aircraftss]);
+        return Inertia::render('adminUi/Aircraft', ['aircraftss' => $aircraftss]);
     }
+
+    public function destroy($id)
+{
+    $aircraft = AircraftModel::find($id);
+
+    if (!$aircraft) {
+        return response()->json(['message' => 'Aircraft not found'], 404);
+    }
+
+    $aircraft->delete();
+
+   
+}
 
 }

@@ -16,5 +16,6 @@ class Flight extends Model
         'date',
         'time',
         'status',
+        'aircraft_id'
     ];
 }

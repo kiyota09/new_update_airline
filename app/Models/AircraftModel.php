@@ -9,15 +9,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class AircraftModel extends Model
 {
     use HasFactory;
-   protected $table = 'aircraft';
+    protected $table = 'aircraft';
     protected $fillable = [
         'aircraft_id',
         'model',
         'registration',
-        'capacity',
+        'business',
+        'firstclass',
+        'economy',
         'status',
         'location',
+        'aircraft_id',
     ];
-
-   
 }

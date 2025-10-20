@@ -36,6 +36,9 @@ Route::middleware(['auth', 'verified', 'no-cache'])->group(function () {
 
     Route::get('/user-validate', [UserController::class, 'userValidate'])->name('user.validate');
     Route::post('/booking', [UserBookingController::class, 'store'])->name('booking');
+    Route::get('/user_history', [UserBookingController::class, 'full_user_details'])->name('user_history');
+    Route::get('/user2_history', [UserBookingController::class, 'full_user2_details'])->name('user2_history');
+
 
     Route::get('/additional', [AdditionUserData::class, 'create'])->name('additional');
     Route::post('/additionalDatas', [AdditionUserData::class, 'store'])->name('additionalDatas');
@@ -43,8 +46,9 @@ Route::middleware(['auth', 'verified', 'no-cache'])->group(function () {
     Route::get('/u', [UserDatasController::class, 'showUser'])->name('u');
 
     Route::post('/aircraft', [AdminController::class, 'index'])->name('aircraft');
-
     Route::get('/air', [AdminController::class, 'show'])->name('air');
+
+    Route::delete('/aircraft/{id}', [AdminController::class, 'destroy'])->name('aircraft.destroy');
 
     Route::get('/booking', function () {
         return Inertia::render('adminUi/Bookings');
@@ -82,6 +86,10 @@ Route::middleware(['auth', 'verified', 'no-cache'])->group(function () {
         return Inertia::render('users/MyBookings');
     });
 
+    Route::get('/mytransac', function () {
+        return Inertia::render('users/transactionpage');
+    });
+
     Route::post('/route_location', [RouteController::class, 'store'])->name('route_location');
 
     Route::put('/routes/{id}', [RouteController::class, 'update'])->name('routes.update');
@@ -99,22 +107,30 @@ Route::middleware(['auth', 'verified', 'no-cache'])->group(function () {
     Route::delete('/admin/schedule/{flight}', [FlightController::class, 'destroy']);
 
     Route::post('/staff_submit', [StaffController::class, 'store'])->name('staff_submit');
+    Route::put('/staff/{id}', [StaffController::class, 'update'])->name('staff.update'); // Edit staff
+
 
     Route::post('/search_destination', [locationDestinationController::class, 'search_avial'])->name('search_destination');
 
     Route::post('/price_destination', [locationDestinationController::class, 'selected_price'])->name('price_destination');
+    Route::post('/aircraft_destination', [locationDestinationController::class, 'fligth_aircraft'])->name('aricraft_destination');
+    Route::get('/aircraft/flight/{flight_id}', [locationDestinationController::class, 'getByFlight']);
+    Route::post('/full-flight-details', [locationDestinationController::class, 'full_flight_details']);
 
 
-Route::get('/payment-success', [PaymentController::class, 'paymentSuccess'])->name('payment.success');
-Route::get('/payment-failed', [PaymentController::class, 'paymentFailed'])->name('payment.failed');
+
+    Route::get('/payment-success', [PaymentController::class, 'paymentSuccess'])->name('payment.success');
+    Route::get('/payment-failed', [PaymentController::class, 'paymentFailed'])->name('payment.failed');
 
     Route::post('/create-payment-intent', [PaymentController::class, 'try']);
 
-    Route::get('/payment', function(){
-       return Inertia::render('users/payment');
+    Route::get('/payment', function () {
+        return Inertia::render('users/payment');
     });
 
-    Route::post('/userHistory',[userHistoryController::class , 'submitTransac'])->name('userHistory');
+    Route::post('/userHistory', [userHistoryController::class, 'submitTransac'])->name('userHistory');
+
+    Route::delete('/staff/{id}', [StaffController::class, 'destroy'])->name('staff.destroy');
 });
 
 // -----------------------------

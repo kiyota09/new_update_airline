@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useForm, usePage } from '@inertiajs/vue3';
-import { ref, watch, onMounted } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import Sidebar from './NewSideBar.vue';
 
 const page = usePage();
@@ -9,14 +9,16 @@ const page = usePage();
 const form = useForm({
     model: '',
     registration: '',
-    capacity: '',
+    economyClassCapacity: '',
+    businessClassCapacity: '',
+    firstClassCapacity: '',
     location: '',
     idnum: '',
 });
 
 // Reactive array for aircraft
 const aircraft = ref<Array<AircraftItem>>(
-    Array.isArray(page.props.aircraftss) ? page.props.aircraftss : []
+    Array.isArray(page.props.aircraftss) ? page.props.aircraftss : [],
 );
 
 // Modal control
@@ -49,22 +51,72 @@ watch(departureSearch, (val) => {
         (a) =>
             a.city.toLowerCase().includes(val.toLowerCase()) ||
             a.airport.toLowerCase().includes(val.toLowerCase()) ||
-            a.country.toLowerCase().includes(val.toLowerCase())
+            a.country.toLowerCase().includes(val.toLowerCase()),
     );
 });
 
 // Location data
 const location: Airport[] = [
-    { id: 1, country: 'United States', city: 'New York', airport: 'John F. Kennedy International Airport (JFK)' },
-    { id: 2, country: 'United States', city: 'Los Angeles', airport: 'Los Angeles International Airport (LAX)' },
-    { id: 3, country: 'United States', city: 'Chicago', airport: 'O’Hare International Airport (ORD)' },
-    { id: 4, country: 'United States', city: 'San Francisco', airport: 'San Francisco International Airport (SFO)' },
-    { id: 5, country: 'United Kingdom', city: 'London', airport: 'Heathrow Airport (LHR)' },
-    { id: 6, country: 'United Kingdom', city: 'London', airport: 'Gatwick Airport (LGW)' },
-    { id: 7, country: 'United Kingdom', city: 'Manchester', airport: 'Manchester Airport (MAN)' },
-    { id: 8, country: 'United Kingdom', city: 'Birmingham', airport: 'Birmingham Airport (BHX)' },
-    { id: 9, country: 'Germany', city: 'Frankfurt', airport: 'Frankfurt Airport (FRA)' },
-    { id: 10, country: 'Germany', city: 'Munich', airport: 'Munich Airport (MUC)' },
+    {
+        id: 1,
+        country: 'United States',
+        city: 'New York',
+        airport: 'John F. Kennedy International Airport (JFK)',
+    },
+    {
+        id: 2,
+        country: 'United States',
+        city: 'Los Angeles',
+        airport: 'Los Angeles International Airport (LAX)',
+    },
+    {
+        id: 3,
+        country: 'United States',
+        city: 'Chicago',
+        airport: 'O’Hare International Airport (ORD)',
+    },
+    {
+        id: 4,
+        country: 'United States',
+        city: 'San Francisco',
+        airport: 'San Francisco International Airport (SFO)',
+    },
+    {
+        id: 5,
+        country: 'United Kingdom',
+        city: 'London',
+        airport: 'Heathrow Airport (LHR)',
+    },
+    {
+        id: 6,
+        country: 'United Kingdom',
+        city: 'London',
+        airport: 'Gatwick Airport (LGW)',
+    },
+    {
+        id: 7,
+        country: 'United Kingdom',
+        city: 'Manchester',
+        airport: 'Manchester Airport (MAN)',
+    },
+    {
+        id: 8,
+        country: 'United Kingdom',
+        city: 'Birmingham',
+        airport: 'Birmingham Airport (BHX)',
+    },
+    {
+        id: 9,
+        country: 'Germany',
+        city: 'Frankfurt',
+        airport: 'Frankfurt Airport (FRA)',
+    },
+    {
+        id: 10,
+        country: 'Germany',
+        city: 'Munich',
+        airport: 'Munich Airport (MUC)',
+    },
     // ... add all other locations as needed
 ];
 
@@ -72,7 +124,9 @@ const location: Airport[] = [
 interface AircraftItem {
     model: string;
     registration: string;
-    capacity: number | string;
+    economyClassCapacity: number | string;
+    businessClassCapacity: number | string;
+    firstClassCapacity: number | string;
     status?: string;
     location?: string;
     [key: string]: any;
@@ -81,11 +135,11 @@ interface AircraftItem {
 // Fetch aircraft from backend (if you have a GET route)
 const fetchAircraft = async () => {
     try {
-        const response = await fetch('/aircraft'); // Replace with your GET endpoint
+        const response = await fetch('/air'); // Replace with your GET endpoint
         const data = await response.json();
         aircraft.value = data.aircraftss || [];
     } catch (error) {
-        console.error('Failed to fetch aircraft:', error);
+        console.log('Failed to fetch aircraft:', error);
     }
 };
 
@@ -98,12 +152,15 @@ const locationFlights = () => {
             aircraft.value.push({
                 model: form.model,
                 registration: form.registration,
-                capacity: form.capacity,
+                economyClassCapacity: form.economyClassCapacity,
+                businessClassCapacity: form.businessClassCapacity,
+                firstClassCapacity: form.firstClassCapacity,
                 location: form.location,
                 status: 'Active', // default
             });
             form.reset();
             showAddAircraftModal.value = false;
+            window.location.reload();
         },
         onError: (errors) => console.log('Validation errors:', errors),
     });
@@ -113,12 +170,21 @@ const locationFlights = () => {
 onMounted(() => {
     fetchAircraft();
 });
+
+// Delete aircraft
+const deleteAircraft = async (id: number) => {
+
+    try {
+        await form.delete(`/aircraft/${id}`);
+        // Remove the deleted aircraft from local array
+        aircraft.value = aircraft.value.filter(a => a.id !== id);
+        console.log('Aircraft deleted successfully');
+    } catch (error) {
+        console.log('Failed to delete aircraft:', error);
+    }
+};
 </script>
-
-
 <template>
-  
-
     <div class="flex min-h-screen bg-gray-50">
         <Sidebar />
 
@@ -160,38 +226,6 @@ onMounted(() => {
                 <div
                     class="mb-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4"
                 >
-                    <!-- Total Aircraft -->
-                    <!-- <div
-                        class="rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 p-6 text-white shadow-lg"
-                    >
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-blue-100">Total Aircraft</p>
-                                <p class="text-3xl font-bold">{{ aircraft.length}}</p>
-                            </div>
-                            <div class="rounded-xl bg-blue-400/20 p-3">
-                                <svg
-                                    class="h-6 w-6"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-                                    />
-                                </svg>
-                            </div>
-                        </div>
-                        <div
-                            class="mt-2 flex items-center text-sm text-blue-200"
-                        >
-                            <span class="ml-1">+2 from last quarter</span>
-                        </div>
-                    </div> -->
-
                     <!-- Active Aircraft -->
                     <div
                         class="rounded-2xl bg-gradient-to-br from-green-500 to-green-600 p-6 text-white shadow-lg"
@@ -199,7 +233,9 @@ onMounted(() => {
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-green-100">Active Aircraft</p>
-                                <p class="text-3xl font-bold">{{ aircraft.length}}</p>
+                                <p class="text-3xl font-bold">
+                                    {{ aircraft.length }}
+                                </p>
                             </div>
                             <div class="rounded-xl bg-green-400/20 p-3">
                                 <svg
@@ -223,40 +259,6 @@ onMounted(() => {
                             <span class="ml-1">Total active Aircratf</span>
                         </div>
                     </div>
-
-                    <!-- In Maintenance -->
-                    <!-- <div
-                        class="rounded-2xl bg-gradient-to-br from-yellow-500 to-yellow-600 p-6 text-white shadow-lg"
-                    >
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-yellow-100">In Maintenance</p>
-                                <p class="text-3xl font-bold"></p>
-                            </div>
-                            <div class="rounded-xl bg-yellow-400/20 p-3">
-                                <svg
-                                    class="h-6 w-6"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                                    />
-                                </svg>
-                            </div>
-                        </div>
-                        <div
-                            class="mt-2 flex items-center text-sm text-yellow-200"
-                        >
-                            <span class="ml-1"
-                                >Scheduled checks and repairs</span
-                            >
-                        </div>
-                    </div> -->
 
                     <!-- Average Capacity -->
                     <div
@@ -290,7 +292,6 @@ onMounted(() => {
                         </div>
                     </div>
                 </div>
-
                 <!-- Aircraft Table -->
                 <div class="rounded-lg bg-white p-6 shadow-md">
                     <h2 class="mb-4 text-xl font-semibold">Aircraft List</h2>
@@ -304,6 +305,15 @@ onMounted(() => {
                                     Registration
                                 </th>
                                 <th class="px-4 py-2 font-medium text-gray-700">
+                                    First Class
+                                </th>
+                                <th class="px-4 py-2 font-medium text-gray-700">
+                                    Business
+                                </th>
+                                <th class="px-4 py-2 font-medium text-gray-700">
+                                    Economy
+                                </th>
+                                <th class="px-4 py-2 font-medium text-gray-700">
                                     Capacity
                                 </th>
                                 <th class="px-4 py-2 font-medium text-gray-700">
@@ -311,6 +321,9 @@ onMounted(() => {
                                 </th>
                                 <th class="px-4 py-2 font-medium text-gray-700">
                                     Location
+                                </th>
+                                <th class="px-4 py-2 font-medium text-gray-700">
+                                    Remove
                                 </th>
                             </tr>
                         </thead>
@@ -328,13 +341,34 @@ onMounted(() => {
                                     {{ aircraftItem.registration }}
                                 </td>
                                 <td class="px-4 py-3">
-                                    {{ aircraftItem.capacity }}
+                                    {{ aircraftItem.firstclass }}
+                                </td>
+                                <td class="px-4 py-3">
+                                    {{ aircraftItem.business }}
+                                </td>
+                                <td class="px-4 py-3">
+                                    {{ aircraftItem.economy }}
+                                </td>
+                                <td class="px-4 py-3">
+                                    {{
+                                        Number(aircraftItem.firstclass) +
+                                        Number(aircraftItem.business) +
+                                        Number(aircraftItem.economy) || 'loading...'
+                                    }}
                                 </td>
                                 <td class="px-4 py-3">
                                     {{ aircraftItem.status }}
                                 </td>
                                 <td class="px-4 py-3">
                                     {{ aircraftItem.location }}
+                                </td>
+                                <td class="px-4 py-3">
+                                    <button
+                                        @click="deleteAircraft(aircraftItem.id)"
+                                        class="text-red-600 hover:underline"
+                                    >
+                                        Delete
+                                    </button>
                                 </td>
                             </tr>
                         </tbody>
@@ -344,7 +378,7 @@ onMounted(() => {
                 <!-- Add Aircraft Modal -->
                 <div
                     v-if="showAddAircraftModal"
-                   class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-white/30"
+                    class="fixed inset-0 z-50 flex items-center justify-center bg-white/30 backdrop-blur-sm"
                 >
                     <div class="w-full max-w-md rounded-lg bg-white p-6">
                         <h3 class="mb-4 text-xl font-bold">
@@ -382,18 +416,44 @@ onMounted(() => {
                                     placeholder="e.g. RP-C1234"
                                 />
                             </div>
+
                             <div>
                                 <label
                                     class="block text-sm font-medium text-gray-700"
-                                    >Capacity</label
+                                    >First Class</label
                                 >
                                 <input
-                                    v-model="form.capacity"
+                                    v-model="form.firstClassCapacity"
                                     type="number"
                                     class="mt-1 w-full rounded-lg border p-2"
                                     placeholder="e.g. 180"
                                 />
                             </div>
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-gray-700"
+                                    >Business Class</label
+                                >
+                                <input
+                                    v-model="form.businessClassCapacity"
+                                    type="number"
+                                    class="mt-1 w-full rounded-lg border p-2"
+                                    placeholder="e.g. 180"
+                                />
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-gray-700"
+                                    >Economy Class</label
+                                >
+                                <input
+                                    v-model="form.economyClassCapacity"
+                                    type="number"
+                                    class="mt-1 w-full rounded-lg border p-2"
+                                    placeholder="e.g. 180"
+                                />
+                            </div>
+
                             <div>
                                 <label
                                     class="block text-sm font-medium text-gray-700"

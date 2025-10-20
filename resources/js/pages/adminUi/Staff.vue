@@ -1,23 +1,43 @@
 <script setup lang="ts">
-import { useForm, usePage } from '@inertiajs/vue3';
+import { Head, router, useForm, usePage } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import Sidebar from './NewSideBar.vue';
-// === Staff Data (demo) ===
 
 // === States ===
 const showModal = ref(false);
 const showAssignModal = ref(false);
 
+// Form for selected staff
 const selectedStaff = useForm({
+    id: null as number | null,
     name: '',
     role: '',
-    assignedFlight: null,
+    assignedFlight: '',
     status: '',
 });
 
 // === Actions ===
 const openAddModal = () => {
+    selectedStaff.reset();
     showModal.value = true;
+};
+
+// Open Edit Modal
+const openEditModal = (staffData: any) => {
+    selectedStaff.id = staffData.id;
+    selectedStaff.name = staffData.fullname;
+    selectedStaff.role = staffData.role;
+    selectedStaff.assignedFlight = staffData.assignedFlight || '';
+    selectedStaff.status = staffData.status;
+    showModal.value = true;
+};
+
+// Open Assign Modal
+const openAssignModal = (staffData: any) => {
+    selectedStaff.id = staffData.id;
+    selectedStaff.name = staffData.fullname;
+    selectedStaff.assignedFlight = staffData.assignedFlight || '';
+    showAssignModal.value = true;
 };
 
 const closeModals = () => {
@@ -25,19 +45,32 @@ const closeModals = () => {
     showAssignModal.value = false;
 };
 
+// Save staff (Add/Edit)
 const saveStaff = () => {
-    selectedStaff.post('/staff_submit');
-    selectedStaff.reset();
+    if (selectedStaff.id) {
+        selectedStaff.put(`/staff/${selectedStaff.id}`);
+    } else {
+        selectedStaff.post('/staff_submit');
+    }
     closeModals();
 };
 
+// Assign flight
 const assignStaff = () => {
+    if (selectedStaff.id) {
+        selectedStaff.put(`/staff_assign/${selectedStaff.id}`);
+    }
     closeModals();
 };
+
+// Delete staff
 const page = usePage();
-const staff = computed(() => {
-    return page.props.StaffList;
-});
+const staff = computed(() => page.props.StaffList);
+const deleteStaff = (id: number) => {
+    if (confirm('Are you sure you want to delete this staff?')) {
+        router.delete('/staff/' + id);
+    }
+};
 </script>
 
 <template>
@@ -60,22 +93,10 @@ const staff = computed(() => {
                     </div>
                     <button
                         @click="openAddModal"
-                        class="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700"
+                        class="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700"
                     >
                         + Add Staff
                     </button>
-                </div>
-
-                <!-- Staff Directory -->
-                <div class="mb-6 flex items-center justify-between">
-                    <h2 class="text-xl font-bold text-gray-700">
-                        Staff Directory
-                    </h2>
-                    <input
-                        type="text"
-                        placeholder="Search by name or role..."
-                        class="rounded-lg border border-gray-300 bg-gray-50 px-4 py-2 text-sm"
-                    />
                 </div>
 
                 <!-- Staff Table -->
@@ -104,17 +125,13 @@ const staff = computed(() => {
                             <tr
                                 v-for="staffList in staff"
                                 :key="staffList.id"
-                                class="border-b border-gray-200 transition hover:bg-gray-50"
+                                class="border-b border-gray-200 hover:bg-gray-50"
                             >
-                                <td class="px-4 py-3">
-                                    {{ staffList.id }}
-                                </td>
+                                <td class="px-4 py-3">{{ staffList.id }}</td>
                                 <td class="px-4 py-3 font-medium">
                                     {{ staffList.fullname }}
                                 </td>
-                                <td class="px-4 py-3">
-                                    {{ staffList.role }}
-                                </td>
+                                <td class="px-4 py-3">{{ staffList.role }}</td>
                                 <td class="px-4 py-3">
                                     {{ staffList.assignedFlight }}
                                 </td>
@@ -137,15 +154,22 @@ const staff = computed(() => {
                                 </td>
                                 <td class="flex justify-center gap-2 px-4 py-3">
                                     <button
-                                        @click="saveStaff"
+                                        @click="openEditModal(staffList)"
                                         class="rounded bg-yellow-500 px-3 py-1 text-sm text-white hover:bg-yellow-600"
                                     >
                                         Edit
                                     </button>
                                     <button
+                                        @click="deleteStaff(staffList.id)"
                                         class="rounded bg-blue-600 px-3 py-1 text-sm text-white hover:bg-blue-700"
                                     >
-                                        Assign
+                                        Delete
+                                    </button>
+                                    <button
+                                        @click="openAssignModal(staffList)"
+                                        class="rounded bg-green-500 px-3 py-1 text-sm text-white hover:bg-green-600"
+                                    >
+                                        Assign Flight
                                     </button>
                                 </td>
                             </tr>
@@ -153,7 +177,6 @@ const staff = computed(() => {
                     </table>
                 </div>
 
-                <!-- Summary -->
                 <div class="mt-8 text-center font-medium text-gray-700">
                     Total Staff: {{ staff.length }}
                 </div>
@@ -173,20 +196,18 @@ const staff = computed(() => {
                                     : 'Add New Staff'
                             }}
                         </h3>
-
                         <div class="space-y-4">
                             <div>
                                 <label class="mb-1 block text-sm font-medium"
                                     >Full Name</label
                                 >
                                 <input
-                                    type="text"
                                     v-model="selectedStaff.name"
+                                    type="text"
                                     placeholder="Enter full name"
                                     class="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2"
                                 />
                             </div>
-
                             <div>
                                 <label class="mb-1 block text-sm font-medium"
                                     >Role</label
@@ -204,7 +225,6 @@ const staff = computed(() => {
                                     <option>Admin</option>
                                 </select>
                             </div>
-
                             <div>
                                 <label class="mb-1 block text-sm font-medium"
                                     >Status</label
@@ -220,7 +240,6 @@ const staff = computed(() => {
                                 </select>
                             </div>
                         </div>
-
                         <div class="mt-6 flex justify-end gap-2">
                             <button
                                 @click="closeModals"
@@ -249,7 +268,6 @@ const staff = computed(() => {
                         <h3 class="mb-4 text-xl font-bold text-blue-600">
                             Assign Flight to {{ selectedStaff.name }}
                         </h3>
-
                         <label class="mb-2 block text-sm font-medium"
                             >Flight Number</label
                         >
@@ -259,7 +277,6 @@ const staff = computed(() => {
                             placeholder="Enter flight number (e.g., FL-102)"
                             class="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2"
                         />
-
                         <div class="mt-6 flex justify-end gap-2">
                             <button
                                 @click="closeModals"

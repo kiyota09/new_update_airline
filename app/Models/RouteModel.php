@@ -12,6 +12,7 @@ class RouteModel extends Model
         'base_price',
         'duration',
         'distance',
+        'aircraft_id',
     ];
 
     protected $table = 'routes_location';

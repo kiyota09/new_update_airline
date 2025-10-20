@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -42,11 +43,31 @@ class AppServiceProvider extends ServiceProvider
                 return \App\Models\RouteModel::all();
             },
 
-            "StaffList" => function() {
+            "StaffList" => function () {
                 return \App\Models\StaffModel::all();
             },
 
-            
+            "AircraftList" => function () {
+                return \App\Models\AircraftModel::all();
+            },
+
+            "history" => function () {
+                return \App\Models\userHistory::all();
+            },
+
+            'user_history' => function () {
+                if (!Auth::check()) {
+                    return []; // if user not logged in
+                }
+
+                return DB::table('history as h')
+                    ->where('h.user_id', Auth::id())
+                    ->orderBy('h.created_at', 'desc')
+                    ->get();
+            },
+
+            'total_income' => DB::table('history')->sum('price'),
+
         ]);
     }
 }

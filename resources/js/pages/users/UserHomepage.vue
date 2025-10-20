@@ -65,7 +65,6 @@ const filteredDestination = ref<Airport[]>([]);
 
 const flightClasses: FlightClass[] = [
     { id: 'economy', name: 'Economy Class' },
-    { id: 'premium', name: 'Premium Economy' },
     { id: 'business', name: 'Business Class' },
     { id: 'first', name: 'First Class' },
 ];
@@ -247,6 +246,8 @@ const openModal = (destination: Destination) => {
 const closeModal = () => {
     showModal.value = false;
     selectedDestination.value = null;
+    showPaymentModals.value = false;
+    showPaymentModal.value = false;
 };
 // ✈️ Flight Search Results Functions
 const openFlightResultsModal = () => {
@@ -351,8 +352,7 @@ const getFlightsForDate = (date: string) => {
 };
 const page = usePage();
 const results = ref([]);
-const flightPrice = ref<number | null>(0); // reactive price
-
+const flightPrice = ref<number | null>(0); // reactive pric
 const fetchPrice = async (flight: Flight) => {
     try {
         const response = await axios.post(
@@ -380,6 +380,7 @@ const fetchPrice = async (flight: Flight) => {
 };
 
 const searchDestination = async () => {
+    
     const dt = {
         departure: form.departure,
         destination: form.destination,
@@ -388,7 +389,7 @@ const searchDestination = async () => {
     console.table('Searching with data:', dt);
 
     try {
-        const res = await axios.post('/search_destination', dt, {
+        const res = await axios.post('/full-flight-details', dt, {
             headers: {
                 'X-CSRF-TOKEN': document
                     .querySelector('meta[name="csrf-token"]')
@@ -400,6 +401,7 @@ const searchDestination = async () => {
 
         // Fetch the price after getting results
         await fetchPrice();
+        await air_flight();
         console.table('Price from backend:', flightPrice.value);
     } catch (err: any) {
         if (err.response && err.response.status === 422) {
@@ -408,6 +410,7 @@ const searchDestination = async () => {
             console.error(err);
         }
     }
+    req_history();
 };
 
 const selectedResultFlight = ref(null);
@@ -437,6 +440,7 @@ const topay = async () => {
 
 const name = ref('');
 const contact = ref('');
+
 
 const selectedPaymentMethod = ref('');
 const selectPayment = (method) => {
@@ -502,9 +506,13 @@ const submit_history = async () => {
         date: selectedFlight.value?.date || bookingForm.departureDate || '',
         totalPrice: flightPrice.value! * parseInt(form.passengers),
         paymentMethod: selectedPaymentMethod.value || '',
+        class: form.flightClasses || bookingForm.flightClasses || '',
+        passenger: parseInt(form.passengers) || bookingForm.passengers || 1,
     };
     console.dir(historyData);
     console.table(historyData);
+    req_history();
+    closeModal();
     try {
         const response = await axios.post('/userHistory', historyData, {
             headers: {
@@ -519,6 +527,66 @@ const submit_history = async () => {
     }
 };
 
+// const air_flight = async () => {
+//     if (!selectedFlight.value) return; // 🛑 prevent crash
+
+//     const t = {
+//         aircraft_id: results.aircraft_id,
+//     };
+//     console.table('Searching with data:', t);
+
+//     try {
+//         const res = await axios.post('/aircraft_destination', t, {
+//             headers: {
+//                 'X-CSRF-TOKEN': document
+//                     .querySelector('meta[name="csrf-token"]')
+//                     ?.getAttribute('content'),
+//             },
+//         });
+
+//         results.value = res.data.aircraft;
+//         console.table('Results:', results.value);
+
+//         await fetchPrice(selectedFlight.value); // ✅ pass flight
+//         console.table('Price from backend:', flightPrice.value);
+//     } catch (err: any) {
+//         if (err.response && err.response.status === 422) {
+//             console.error('Validation errors:', err.response.data.errors);
+//         } else {
+//             console.error(err);
+//         }
+//     }
+// };
+
+const fetchStaffByFlight = async (flightId: number) => {
+    const res = await axios.get(`/staff/flight/${flightId}`);
+    staffList.value = res.data;
+};
+const req_histoRy = page.props.history;
+
+
+
+const req_history = async () => {
+    const historyReq = {
+        departureDate: form.departureDate || '',
+        flight_id: results.flightNo|| '',
+    }
+    console.dir(historyReq);
+    console.table(historyReq);
+    // closeModal();
+    // try {
+    //     const response = await axios.post('/userHistory', historyData, {
+    //         headers: {
+    //             'X-CSRF-TOKEN': document
+    //                 .querySelector('meta[name="csrf-token"]')
+    //                 ?.getAttribute('content'),
+    //         },
+    //     });
+    //     console.log('History submission response:', response.data);
+    // } catch (error) {
+    //     console.error('Error submitting history:', error);
+    // }
+};
 // Using axios
 </script>
 
@@ -713,7 +781,7 @@ const submit_history = async () => {
             </div>
         </div>
     </section>
-
+<!-- {{ req_histoRy }} -->
     <!-- 🌍 Featured Destinations -->
     <section class="bg-gray-50 py-16 dark:bg-gray-900">
         <div class="container mx-auto px-4">
@@ -864,6 +932,7 @@ const submit_history = async () => {
                                 </div>
                             </div>
                         </div>
+                        <!-- {{ results }} -->
                         <div
                             v-for="flight in results"
                             :key="flight.id"
@@ -914,6 +983,24 @@ const submit_history = async () => {
                                         })
                                     }}
                                 </p>
+                                <!-- <p>
+                                    <span class="font-medium text-gray-600"
+                                        >Economy:</span
+                                    >
+                                    {{ flight.economy }} /
+                                </p>
+                                <p>
+                                    <span class="font-medium text-gray-600"
+                                        >Business:</span
+                                    >
+                                    {{ flight.business }}
+                                </p>
+                                <p>
+                                    <span class="font-medium text-gray-600"
+                                        >First Class:</span
+                                    >
+                                    {{ flight.firstclass }}
+                                </p> -->
                             </div>
 
                             <div class="mt-3">

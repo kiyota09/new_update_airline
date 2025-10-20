@@ -1,40 +1,30 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from 'vue'
 import Sidebar from './NewSideBar.vue'
+import { usePage } from '@inertiajs/vue3'
+
+const page = usePage()
+const income = page.props.total_income;
+const payments = page.props.history;
+// ✅ Format total income with $ and commas
+const total = computed(() => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(income)
+})
 
 // === Demo Data (Replace later with backend) ===
 const transactions = ref([
-  {
-    id: 1,
-    bookingId: 'BK-1001',
-    passenger: 'John Dela Cruz',
-    amount: 3200,
-    status: 'Paid',
-    date: '2025-10-09',
-    method: 'Credit Card'
-  },
-  {
-    id: 2,
-    bookingId: 'BK-1002',
-    passenger: 'Maria Santos',
-    amount: 4500,
-    status: 'Refunded',
-    date: '2025-10-08',
-    method: 'GCash'
-  },
-  {
-    id: 3,
-    bookingId: 'BK-1003',
-    passenger: 'Alex Mendoza',
-    amount: 2700,
-    status: 'Pending',
-    date: '2025-10-10',
-    method: 'Bank Transfer'
-  }
+  { id: 1, bookingId: 'BK-1001', passenger: 'John Dela Cruz', amount: 3200, status: 'Paid', date: '2025-10-09', method: 'Credit Card' },
+  { id: 2, bookingId: 'BK-1002', passenger: 'Maria Santos', amount: 4500, status: 'Refunded', date: '2025-10-08', method: 'GCash' },
+  { id: 3, bookingId: 'BK-1003', passenger: 'Alex Mendoza', amount: 2700, status: 'Pending', date: '2025-10-10', method: 'Bank Transfer' }
 ])
 
 // === Filters & States ===
-const selectedTransaction = ref(null)
+const selectedTransaction = ref<any>(null)
 const showInvoiceModal = ref(false)
 const showRefundModal = ref(false)
 
@@ -81,10 +71,10 @@ const confirmRefund = () => {
 
 <template>
   <Head title="Payment & Billing Management" />
-  
+
   <div class="flex min-h-screen bg-gray-50">
     <Sidebar />
-    
+
     <div class="flex-1 ml-64">
       <div class="p-6">
         <!-- Header -->
@@ -103,19 +93,11 @@ const confirmRefund = () => {
         <!-- Dashboard Summary -->
         <div class="grid md:grid-cols-3 gap-6 mb-8">
           <div class="bg-green-100 p-6 rounded-2xl shadow text-center">
-            <h2 class="text-3xl font-bold text-green-600">{{ totalIncome.toLocaleString() }} ₱</h2>
+            <h2 class="text-3xl font-bold text-green-600">{{ total }}</h2>
             <p class="font-medium text-gray-700">Total Income</p>
           </div>
-          <div class="bg-yellow-100 p-6 rounded-2xl shadow text-center">
-            <h2 class="text-3xl font-bold text-yellow-600">{{ totalPending.toLocaleString() }} ₱</h2>
-            <p class="font-medium text-gray-700">Pending Payments</p>
-          </div>
-          <div class="bg-red-100 p-6 rounded-2xl shadow text-center">
-            <h2 class="text-3xl font-bold text-red-600">{{ totalRefunds.toLocaleString() }} ₱</h2>
-            <p class="font-medium text-gray-700">Total Refunds</p>
-          </div>
         </div>
-
+{{ payments }}
         <!-- Transactions Table -->
         <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
           <table class="w-full text-left border-collapse">
@@ -133,7 +115,7 @@ const confirmRefund = () => {
             </thead>
             <tbody>
               <tr
-                v-for="transaction in transactions"
+                v-for="transaction in payments"
                 :key="transaction.id"
                 class="border-b border-gray-200 hover:bg-gray-50 transition"
               >
@@ -161,13 +143,6 @@ const confirmRefund = () => {
                     class="bg-blue-600 hover:bg-blue-700 text-white text-sm py-1 px-3 rounded"
                   >
                     Invoice
-                  </button>
-                  <button
-                    @click="openRefundModal(transaction)"
-                    class="bg-red-600 hover:bg-red-700 text-white text-sm py-1 px-3 rounded"
-                    :disabled="transaction.status === 'Refunded'"
-                  >
-                    Refund
                   </button>
                 </td>
               </tr>

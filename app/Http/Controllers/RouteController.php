@@ -17,6 +17,7 @@ class RouteController extends Controller
             'base_price' => 'required|integer|min:0',
             'duration' => 'required|string|max:255',
             'distance' => 'required|integer',
+            'aircraft' => 'required|integer',
         ]);
 
         $routing = new RouteModel();
@@ -25,9 +26,10 @@ class RouteController extends Controller
         $routing->base_price = $validated['base_price'];
         $routing->duration = $validated['duration'];
         $routing->distance = $validated['distance'];
+        $routing->aircraft_id = $validated['aircraft'];
         $routing->save();
 
-        return back();
+        return redirect()->back();
     }
 
     public function update(Request $request, $id)

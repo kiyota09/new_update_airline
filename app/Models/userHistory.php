@@ -16,6 +16,12 @@ class userHistory extends Model
         'name',
         'contact',
         'paymentMethod',
+        'class',
+        'passenger',
+        'user_id',
+        'ticket',
+        'payment_ref',
 
     ];
+    protected $table = 'history';
 }
