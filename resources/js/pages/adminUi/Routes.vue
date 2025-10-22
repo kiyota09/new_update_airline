@@ -40,7 +40,7 @@ const openEditModal = (route: any) => {
     formData.id = route.id;
     formData.origin_route = route.origin_route;
     formData.destination_route = route.destination_route;
-    formData.base_price = route.base_price.toLocaleString();
+    formData.base_price = route.base_price;
     formData.duration = route.duration;
     formData.distance = route.distance;
     showEditModal.value = true;
